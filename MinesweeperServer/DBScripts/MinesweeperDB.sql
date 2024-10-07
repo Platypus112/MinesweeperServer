@@ -1,6 +1,6 @@
 ﻿use Master;
 Go
-IF EXISTS (SELECT * FROM sys.databases WHERE name=N'MinesweeperDB')
+IF EXISTS (SELECT * FROM sys.databases WHERE name='MinesweeperDB')
 BEGIN
 	DROP DATABASE MinesweeperDB;
 END
@@ -56,7 +56,7 @@ CREATE TABLE GameReports(
 	[statusId] int NOT NULL, --the status of the report
 	[Description] nvarchar(200) NULL, --the description of the problem. dosn't have to be filled
 	CONSTRAINT FK_ReportToGameID FOREIGN KEY (gameId) REFERENCES FinishedGames(id),
-	CONSTRAINT FK_ReportToStatus FOREIGN KEY (statusId) REFERENCES Statuses(id), --connects the report to it's status
+	CONSTRAINT FK_GameReportToStatus FOREIGN KEY (statusId) REFERENCES Statuses(id), --connects the report to it's status
 )
 
 CREATE TABLE UserReports(
@@ -65,7 +65,7 @@ CREATE TABLE UserReports(
 	[statusId] int NOT NULL, --the status of the report
 	[Description] nvarchar(200) NULL, --the description of the problem. dosn't have to be filled
 	CONSTRAINT FK_ReportToUserID FOREIGN KEY (userId) REFERENCES Users(id),
-	CONSTRAINT FK_ReportToStatus FOREIGN KEY (statusId) REFERENCES Statuses(id), --connects the report to it's status
+	CONSTRAINT FK_UserReportToStatus FOREIGN KEY (statusId) REFERENCES Statuses(id), --connects the report to it's status
 )
 
 CREATE TABLE Friends(
@@ -79,18 +79,48 @@ CREATE TABLE Friends(
 	--while the request is still pending then the status will be pending
 	CONSTRAINT FK_FriendsToUser1ID FOREIGN KEY (userSendingId) REFERENCES Users(id),
 	CONSTRAINT FK_FriendsToUser2ID FOREIGN KEY (userRecievingId) REFERENCES Users(id),
-	CONSTRAINT FK_ReportToStatus FOREIGN KEY (statusId) REFERENCES Statuses(id),
+	CONSTRAINT FK_RequestToStatus FOREIGN KEY (statusId) REFERENCES Statuses(id),
 )
-
+go
 INSERT INTO dbo.Users VALUES('joeAdmin','idancar7@gmail.com','idan12345',null,'most esteamed leader',1);
 INSERT INTO dbo.Users VALUES('joeUser','joe6987@gmail.com','joemode5',null,'nuh uh',0);
+INSERT INTO dbo.Users VALUES('badGuy','baddy77@gmail.com','bad1',null,'tee hee',0);
 
 INSERT INTO dbo.Statuses VALUES('pending');
 INSERT INTO dbo.Statuses VALUES('approved');
 INSERT INTO dbo.Statuses VALUES('declined');
 
-INSERT INTO dbo.Difficulties VALUES('Begginer',22,12,12)
-INSERT INTO dbo.Difficulties VALUES('Easy',10,7,10)
-INSERT INTO dbo.Difficulties VALUES('Medium',22,12,40)
-INSERT INTO dbo.Difficulties VALUES('Hard',32,7,100)
-INSERT INTO dbo.Difficulties VALUES('Extreme',10,7,10)
+INSERT INTO dbo.Difficulties VALUES('Begginer',22,12,12);
+INSERT INTO dbo.Difficulties VALUES('Easy',10,7,10);
+INSERT INTO dbo.Difficulties VALUES('Medium',22,12,40);
+INSERT INTO dbo.Difficulties VALUES('Hard',32,7,100);
+INSERT INTO dbo.Difficulties VALUES('Extreme',10,7,10);
+
+go
+INSERT INTO dbo.Friends VALUES(2,1,1)
+INSERT INTO dbo.Friends VALUES(2,3,2)
+INSERT INTO dbo.Friends VALUES(3,2,2)
+
+go
+INSERT INTO dbo.UserReports VALUES(3,1,'too bad')
+
+go
+INSERT INTO dbo.FinishedGames VALUES(1,5,'4-june-2024',145)
+Go
+
+-- Create a login for the admin user
+CREATE LOGIN [TaskAdminLogin] WITH PASSWORD = 'joe123';
+Go
+
+-- Create a user in the TasksManagementDB database for the login
+CREATE USER [TaskAdminUser] FOR LOGIN [TaskAdminLogin];
+Go
+
+-- Add the user to the db_owner role to grant admin privileges
+ALTER ROLE db_owner ADD MEMBER [TaskAdminUser];
+Go
+
+--EF Code
+
+--scaffold-DbContext "Server = (localdb)\MSSQLLocalDB;Initial Catalog=MinesweeperDB;User ID=TaskAdminLogin;Password=joe123;" Microsoft.EntityFrameworkCore.SqlServer -OutPutDir Models -Context TasksManagementDbContext -DataAnnotations -force
+
