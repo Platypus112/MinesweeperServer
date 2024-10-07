@@ -17,5 +17,11 @@ public partial class Status
     public string Name { get; set; } = null!;
 
     [InverseProperty("Status")]
+    public virtual ICollection<Friend> Friends { get; set; } = new List<Friend>();
+
+    [InverseProperty("Status")]
     public virtual ICollection<GameReport> GameReports { get; set; } = new List<GameReport>();
+
+    [InverseProperty("Status")]
+    public virtual ICollection<UserReport> UserReports { get; set; } = new List<UserReport>();
 }

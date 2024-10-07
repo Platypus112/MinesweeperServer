@@ -30,4 +30,13 @@ public partial class User
 
     [InverseProperty("UserNavigation")]
     public virtual ICollection<FinishedGame> FinishedGames { get; set; } = new List<FinishedGame>();
+
+    [InverseProperty("UserRecieving")]
+    public virtual ICollection<Friend> FriendUserRecievings { get; set; } = new List<Friend>();
+
+    [InverseProperty("UserSending")]
+    public virtual ICollection<Friend> FriendUserSendings { get; set; } = new List<Friend>();
+
+    [InverseProperty("User")]
+    public virtual ICollection<UserReport> UserReports { get; set; } = new List<UserReport>();
 }
