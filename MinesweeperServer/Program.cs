@@ -1,4 +1,7 @@
 
+using Microsoft.EntityFrameworkCore;
+using MinesweeperServer.Models;
+
 namespace MinesweeperServer
 {
     public class Program
@@ -14,6 +17,18 @@ namespace MinesweeperServer
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddDistributedMemoryCache();
+
+            builder.Services.AddSession(options =>
+            {
+                // Set a short timeout for easy testing.
+                options.IdleTimeout = TimeSpan.FromHours(2.5);
+                options.Cookie.HttpOnly = true;
+            });
+
+            builder.Services.AddDbContext<TasksManagementDbContext>(options =>
+            options.UseSqlServer("Server = (localdb)\\MSSQLLocalDB;Initial Catalog=MinesweeperDB;User ID=TaskAdminLogin;Password=joe123;Trusted_Connection=true;MultipleActiveResultSets=true;"));
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -22,6 +37,8 @@ namespace MinesweeperServer
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseSession();
 
             app.UseHttpsRedirection();
 
