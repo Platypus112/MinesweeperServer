@@ -28,7 +28,7 @@ namespace MinesweeperServer
             });
 
             builder.Services.AddDbContext<MinesweeperDbContext>(options =>
-            options.UseSqlServer("Server = (localdb)\\MSSQLLocalDB;Initial Catalog=MinesweeperDB;User ID=TaskAdminLogin;Password=joe123;Trusted_Connection=true;MultipleActiveResultSets=true;"));
+            options.UseSqlServer("Server = (localdb)\\MSSQLLocalDB;Initial Catalog=MinesweeperDB;User ID=AdminLogin;Password=joe123;Trusted_Connection=true;MultipleActiveResultSets=true;"));
 
             var app = builder.Build();
 

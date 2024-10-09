@@ -13,10 +13,10 @@ namespace MinesweeperServer.Controllers
         private IWebHostEnvironment webHostEnvironment;
         private MinesweeperDbContext context;
 
-        public MinesweeperContorller(IWebHostEnvironment webHostEnvironment_/*,TasksManagementDbContext context_*/)
+        public MinesweeperContorller(IWebHostEnvironment webHostEnvironment_, MinesweeperDbContext context_)
         {
             webHostEnvironment= webHostEnvironment_;
-            //context= context_;
+            context = context_;
         }
 
         [HttpPost("Register")]

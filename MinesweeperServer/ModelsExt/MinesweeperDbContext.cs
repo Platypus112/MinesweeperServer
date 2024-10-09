@@ -1,6 +1,6 @@
 ﻿namespace MinesweeperServer.ModelsExt
 {
-    public partial class TasksManagementDbContext
+    public partial class MinesweeperDbContext
     {
 
     }
