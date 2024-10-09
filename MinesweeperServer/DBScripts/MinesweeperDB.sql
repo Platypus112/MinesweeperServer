@@ -1,6 +1,6 @@
 ﻿use Master;
 Go
-IF EXISTS (SELECT * FROM sys.databases WHERE name='MinesweeperDB')
+IF EXISTS (SELECT * FROM sys.databases WHERE name=N'MinesweeperDB')
 BEGIN
 	DROP DATABASE MinesweeperDB;
 END
@@ -93,8 +93,8 @@ INSERT INTO dbo.Statuses VALUES('declined');
 INSERT INTO dbo.Difficulties VALUES('Begginer',22,12,12);
 INSERT INTO dbo.Difficulties VALUES('Easy',10,7,10);
 INSERT INTO dbo.Difficulties VALUES('Medium',22,12,40);
-INSERT INTO dbo.Difficulties VALUES('Hard',32,7,100);
-INSERT INTO dbo.Difficulties VALUES('Extreme',10,7,10);
+INSERT INTO dbo.Difficulties VALUES('Hard',32,18,100);
+INSERT INTO dbo.Difficulties VALUES('Extreme',32,18,150);
 
 go
 INSERT INTO dbo.Friends VALUES(2,1,1)
@@ -109,18 +109,18 @@ INSERT INTO dbo.FinishedGames VALUES(1,5,'4-june-2024',145)
 Go
 
 -- Create a login for the admin user
-CREATE LOGIN [TaskAdminLogin] WITH PASSWORD = 'joe123';
+CREATE LOGIN [MinesweeperAdminLogin] WITH PASSWORD = 'joe123';
 Go
 
 -- Create a user in the TasksManagementDB database for the login
-CREATE USER [TaskAdminUser] FOR LOGIN [TaskAdminLogin];
+CREATE USER [MinesweeperAdminUser] FOR LOGIN [MinesweeperAdminLogin];
 Go
 
 -- Add the user to the db_owner role to grant admin privileges
-ALTER ROLE db_owner ADD MEMBER [TaskAdminUser];
+ALTER ROLE db_owner ADD MEMBER [MinesweeperAdminUser];
 Go
 
 --EF Code
 
---scaffold-DbContext "Server = (localdb)\MSSQLLocalDB;Initial Catalog=MinesweeperDB;User ID=TaskAdminLogin;Password=joe123;" Microsoft.EntityFrameworkCore.SqlServer -OutPutDir Models -Context TasksManagementDbContext -DataAnnotations -force
+--scaffold-DbContext "Server = (localdb)\MSSQLLocalDB;Initial Catalog=MinesweeperDB;User ID=MinesweeperAdminLogin;Password=joe123;" Microsoft.EntityFrameworkCore.SqlServer -OutPutDir Models -Context MinesweeperDbContext -DataAnnotations -force
 

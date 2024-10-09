@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MinesweeperServer.Models;
 
-public partial class TasksManagementDbContext : DbContext
+public partial class MinesweeperDbContext : DbContext
 {
-    public TasksManagementDbContext()
+    public MinesweeperDbContext()
     {
     }
 
-    public TasksManagementDbContext(DbContextOptions<TasksManagementDbContext> options)
+    public MinesweeperDbContext(DbContextOptions<MinesweeperDbContext> options)
         : base(options)
     {
     }
@@ -33,23 +33,23 @@ public partial class TasksManagementDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server = (localdb)\\MSSQLLocalDB;Initial Catalog=MinesweeperDB;User ID=TaskAdminLogin;Password=joe123;");
+        => optionsBuilder.UseSqlServer("Server = (localdb)\\MSSQLLocalDB;Initial Catalog=MinesweeperDB;User ID=MinesweeperAdminLogin;Password=joe123;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<DataList>(entity =>
         {
-            entity.HasKey(e => e.Name).HasName("PK__DataList__72E12F1A24573B87");
+            entity.HasKey(e => e.Name).HasName("PK__DataList__72E12F1A7014A280");
         });
 
         modelBuilder.Entity<Difficulty>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Difficul__3213E83F708C61A2");
+            entity.HasKey(e => e.Id).HasName("PK__Difficul__3213E83F7AEB656A");
         });
 
         modelBuilder.Entity<FinishedGame>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Finished__3213E83FE6F89D59");
+            entity.HasKey(e => e.Id).HasName("PK__Finished__3213E83FFDBBAC33");
 
             entity.HasOne(d => d.User).WithMany(p => p.FinishedGames)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -62,7 +62,7 @@ public partial class TasksManagementDbContext : DbContext
 
         modelBuilder.Entity<Friend>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Friends__3213E83FA7E40AAA");
+            entity.HasKey(e => e.Id).HasName("PK__Friends__3213E83F1B286E47");
 
             entity.HasOne(d => d.Status).WithMany(p => p.Friends)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -79,7 +79,7 @@ public partial class TasksManagementDbContext : DbContext
 
         modelBuilder.Entity<GameReport>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__GameRepo__3213E83FE2BB7B61");
+            entity.HasKey(e => e.Id).HasName("PK__GameRepo__3213E83F48806425");
 
             entity.HasOne(d => d.Game).WithMany(p => p.GameReports)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -92,17 +92,17 @@ public partial class TasksManagementDbContext : DbContext
 
         modelBuilder.Entity<Status>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Statuses__3213E83F0C35938E");
+            entity.HasKey(e => e.Id).HasName("PK__Statuses__3213E83FF0F59621");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Users__3213E83F9779F460");
+            entity.HasKey(e => e.Id).HasName("PK__Users__3213E83FCAB9BC9D");
         });
 
         modelBuilder.Entity<UserReport>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__UserRepo__3213E83FC7F1AD75");
+            entity.HasKey(e => e.Id).HasName("PK__UserRepo__3213E83F78B9FEB9");
 
             entity.HasOne(d => d.Status).WithMany(p => p.UserReports)
                 .OnDelete(DeleteBehavior.ClientSetNull)

@@ -23,10 +23,11 @@ namespace MinesweeperServer
             {
                 // Set a short timeout for easy testing.
                 options.IdleTimeout = TimeSpan.FromHours(2.5);
-                options.Cookie.HttpOnly = true;
+                options.Cookie.HttpOnly = false;
+                options.Cookie.IsEssential = true;
             });
 
-            builder.Services.AddDbContext<TasksManagementDbContext>(options =>
+            builder.Services.AddDbContext<MinesweeperDbContext>(options =>
             options.UseSqlServer("Server = (localdb)\\MSSQLLocalDB;Initial Catalog=MinesweeperDB;User ID=TaskAdminLogin;Password=joe123;Trusted_Connection=true;MultipleActiveResultSets=true;"));
 
             var app = builder.Build();
