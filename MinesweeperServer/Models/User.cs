@@ -21,7 +21,8 @@ public partial class User
     [StringLength(30)]
     public string Password { get; set; } = null!;
 
-    public byte[]? Pic { get; set; }
+    [StringLength(5)]
+    public string? PicPath { get; set; }
 
     [StringLength(300)]
     public string? Description { get; set; }

@@ -15,7 +15,7 @@ CREATE TABLE Users(
 	[Name] nvarchar(30) NOT NULL,
 	[Email] nvarchar(70) NOT NULL,
 	[Password] nvarchar(30) NOT NULL,
-	[Pic] varbinary(MAX) NULL,
+	[PicPath] nvarchar(5) NULL,
 	[Description] nvarchar(300) NULL,
 	[Admin] bit NOT NULL
 )
