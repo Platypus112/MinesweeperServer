@@ -20,10 +20,15 @@ namespace MinesweeperServer.Controllers
         }
 
         [HttpPost("Register")]
-        public IActionResult Register([FromBody] UserDTO userDTO)
+        public async Task<IActionResult> Register([FromBody] UserDTO userDTO)
         {
             try
             {
+                if (context.GetUserByEmail(userDTO.Email) != null || context.GetUserByName(userDTO.Name) != null)
+                {
+                    return Conflict("this username or password have already been used");
+                }
+
                 HttpContext.Session.Clear();
                 User user = new User()
                 {
@@ -35,10 +40,12 @@ namespace MinesweeperServer.Controllers
                 context.Users.Add(user);
                 context.SaveChanges();
 
-                HttpContext.Session.SetString("loggedUserEmail", userDTO.Email);
+                await Task.Run(()=>HttpContext.Session.SetString("loggedUserEmail", userDTO.Email));
 
-                AppUserDTO toReturn = new AppUserDTO(user);
-                toReturn.PicPath = GetProfileImageVirtualPath(user.Id);
+                AppUserDTO toReturn = new(user)
+                {
+                    PicPath = GetProfileImageVirtualPath(user.Id)
+                };
 
                 return Ok(toReturn);
             }
@@ -48,16 +55,36 @@ namespace MinesweeperServer.Controllers
             }
         }
         [HttpPost("Login")]
-        public IActionResult Login([FromBody]UserDTO userDTO)
+        public async Task<IActionResult> Login([FromBody]UserDTO userDTO)
         {
-            return Ok();
             try
             {
-                return Ok();
-            }
-            catch
-            {
+                HttpContext.Session.Clear();
+                User? user=null;
 
+                if (!string.IsNullOrEmpty(userDTO.Email))
+                    user = await context.GetUserByEmail(userDTO.Email);
+                else if (!string.IsNullOrEmpty(userDTO.Name))
+                    user = await context.GetUserByName(userDTO.Name);
+                else return NoContent();
+                if(string.IsNullOrEmpty(userDTO.Password)) return NoContent();
+
+                if (user ==null)return NotFound("no user with this email or username");
+
+                if(user.Password!=userDTO.Password) return Unauthorized("password is wrong");
+
+
+                HttpContext.Session.SetString("loggedUserEmail", user.Email);
+
+                AppUserDTO toReturn = new(user)
+                {
+                    PicPath = GetProfileImageVirtualPath(user.Id)
+                };
+                return Ok(toReturn);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
         [HttpPost("UploadProfileImage")]
@@ -71,7 +98,7 @@ namespace MinesweeperServer.Controllers
             }
 
             //Get model user class from DB with matching email. 
-            Models.User? user = context.GetUserByEmail(userEmail);
+            Models.User? user = await context.GetUserByEmail(userEmail);
             //Clear the tracking of all objects to avoid double tracking
             context.ChangeTracker.Clear();
 
