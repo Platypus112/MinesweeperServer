@@ -15,6 +15,7 @@ namespace MinesweeperServer.DTO
 
         public bool IsAdmin { get; set; }
 
+        public AppUserDTO() { }
         public AppUserDTO(string name_,string email_,string password_,string picPath_,bool isAdmin_)
         {
             Name = name_;
@@ -26,6 +27,7 @@ namespace MinesweeperServer.DTO
 
         public AppUserDTO(Models.User user)
         {
+            Id = user.Id;
             Name = user.Name;
             Email = user.Email;
             Password = user.Password;

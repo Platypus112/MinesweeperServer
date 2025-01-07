@@ -10,7 +10,7 @@ namespace MinesweeperServer.DTO
 
         public string Password { get; set; }
 
-
+        public UserDTO() { }
 
         public UserDTO(string name_, string email_, string password_)
         {

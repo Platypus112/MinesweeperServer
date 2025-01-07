@@ -45,6 +45,8 @@ namespace MinesweeperServer
 
             app.UseAuthorization();
 
+            app.UseStaticFiles();
+
 
             app.MapControllers();
 

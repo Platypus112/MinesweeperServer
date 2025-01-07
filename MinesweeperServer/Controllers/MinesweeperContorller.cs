@@ -40,7 +40,7 @@ namespace MinesweeperServer.Controllers
                 context.Users.Add(user);
                 context.SaveChanges();
 
-                await Task.Run(()=>HttpContext.Session.SetString("loggedUserEmail", userDTO.Email));
+                HttpContext.Session.SetString("loggedUserEmail", userDTO.Email);
 
                 AppUserDTO toReturn = new(user)
                 {
@@ -146,7 +146,6 @@ namespace MinesweeperServer.Controllers
                 }
 
             }
-
             AppUserDTO dtoUser = new AppUserDTO(user);
             dtoUser.PicPath = GetProfileImageVirtualPath(user.Id);
             return Ok(dtoUser);
