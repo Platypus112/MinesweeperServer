@@ -25,6 +25,6 @@ public partial class Difficulty
     [Column("bombs")]
     public int Bombs { get; set; }
 
-    [InverseProperty("User")]
+    [InverseProperty("Difficulty")]
     public virtual ICollection<FinishedGame> FinishedGames { get; set; } = new List<FinishedGame>();
 }

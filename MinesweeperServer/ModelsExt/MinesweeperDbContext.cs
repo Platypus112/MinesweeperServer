@@ -1,4 +1,5 @@
-﻿using MinesweeperServer.Models;
+﻿using MinesweeperServer.DTO;
+using MinesweeperServer.Models;
 
 namespace MinesweeperServer.Models
 {
@@ -6,11 +7,24 @@ namespace MinesweeperServer.Models
     {
         public async Task<User?> GetUserByEmail(string email)
         {
-            return this.Users.Where(x=>x.Email==email).FirstOrDefault();
+            return this.Users.FirstOrDefault(x => x.Email == email);
         }
         public async Task<User?> GetUserByName(string name)
         {
-            return this.Users.Where(x => x.Name == name).FirstOrDefault();
+            return this.Users.FirstOrDefault(x => x.Name == name);
+        }
+
+        public async Task<List<Difficulty>> GetDifficultyList()
+        {
+            return this.Difficulties.Where(x=>x!=null).ToList();
+        }
+        public  Difficulty GetDifficultyByDTO(DifficultyDTO dto)
+        {
+            return this.Difficulties.FirstOrDefault(x => x.Name == dto.Name);
+        }
+        public User GetUserByDTO(UserDTO dto)
+        {
+            return this.Users.FirstOrDefault(x => x.Name == dto.Name);
         }
     }
 }

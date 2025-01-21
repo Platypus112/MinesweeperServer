@@ -19,14 +19,75 @@ namespace MinesweeperServer.Controllers
             context = context_;
         }
 
+        [HttpPost("RecordGame")]
+        public async Task<IActionResult> RecordGame([FromBody] FinishedGameDTO gameDTO)
+        {
+            try
+            {
+                if (context.GetUserByDTO(gameDTO.User) == null)
+                {
+                    return Conflict("User doesn't exist");
+                }
+                if (context.GetDifficultyByDTO(gameDTO.Difficulty) == null)
+                {
+                    return Conflict("Difficulty doesn't exist");
+                }
+
+                FinishedGame finished = new()
+                {
+                    Date = gameDTO.Date,
+                    Difficulty = context.GetDifficultyByDTO(gameDTO.Difficulty),
+                    User = context.GetUserByDTO(gameDTO.User),
+                    TimeInSeconds = ((int)gameDTO.TimeInSeconds),
+                };
+
+                context.FinishedGames.Add(finished);
+                context.SaveChanges();
+
+                FinishedGameDTO toReturn = new(finished);
+
+                return Ok(toReturn);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("GetDifficulties")]
+        public async Task<IActionResult> GetDifficulties()
+        {
+            try
+            {
+                List<Difficulty> difficulties = await context.GetDifficultyList();
+
+                if (difficulties==null||difficulties.Count <= 0)
+                {
+                    return NotFound("no difficulties found");
+                }
+
+                List<DifficultyDTO> resultList = new List<DifficultyDTO>();
+                foreach (Difficulty d in difficulties)
+                {
+                    resultList.Add(new DifficultyDTO(d));
+                }
+                return Ok(resultList);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] UserDTO userDTO)
         {
             try
             {
-                if (context.GetUserByEmail(userDTO.Email) != null || context.GetUserByName(userDTO.Name) != null)
+                if (await context.GetUserByEmail(userDTO.Email) != null || await context.GetUserByName(userDTO.Name) != null)
                 {
-                    return Conflict("this username or password have already been used");
+                    return Conflict("this username or email have already been used");
                 }
 
                 HttpContext.Session.Clear();

@@ -29,7 +29,7 @@ public partial class User
 
     public bool Admin { get; set; }
 
-    [InverseProperty("UserNavigation")]
+    [InverseProperty("User")]
     public virtual ICollection<FinishedGame> FinishedGames { get; set; } = new List<FinishedGame>();
 
     [InverseProperty("UserRecieving")]

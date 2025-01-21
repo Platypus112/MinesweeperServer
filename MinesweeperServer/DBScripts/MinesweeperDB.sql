@@ -47,7 +47,7 @@ CREATE TABLE FinishedGames(
 	[Date] DATETIME NULL, --the time the game started--
 	[TimeInSeconds] int NOT NULL, --the time the game took to finish measured in seconds
 	CONSTRAINT FK_GameToPlayerID FOREIGN KEY (userId) REFERENCES Users(id),
-	CONSTRAINT FK_GameIDToDifficultyID FOREIGN KEY (userId) REFERENCES Difficulties(id),
+	CONSTRAINT FK_GameIDToDifficultyID FOREIGN KEY (difficultyId) REFERENCES Difficulties(id),
 )
 
 CREATE TABLE GameReports(

@@ -23,14 +23,14 @@ public partial class FinishedGame
 
     public int TimeInSeconds { get; set; }
 
+    [ForeignKey("DifficultyId")]
+    [InverseProperty("FinishedGames")]
+    public virtual Difficulty Difficulty { get; set; } = null!;
+
     [InverseProperty("Game")]
     public virtual ICollection<GameReport> GameReports { get; set; } = new List<GameReport>();
 
     [ForeignKey("UserId")]
     [InverseProperty("FinishedGames")]
-    public virtual Difficulty User { get; set; } = null!;
-
-    [ForeignKey("UserId")]
-    [InverseProperty("FinishedGames")]
-    public virtual User UserNavigation { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 }
