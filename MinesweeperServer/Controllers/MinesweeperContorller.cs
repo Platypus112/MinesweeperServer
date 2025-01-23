@@ -18,6 +18,26 @@ namespace MinesweeperServer.Controllers
             webHostEnvironment= webHostEnvironment_;
             context = context_;
         }
+        [HttpGet("GetDataList")]
+        public async Task<IActionResult> GetDataList([FromBody] string name)
+        {
+            try
+            {
+                DataList? result=await context.GetDataListByName(name);
+
+                if(result== null) 
+                { 
+                    return NotFound("no datalist found with that name");
+                }
+
+                DataListDTO toReturn= new DataListDTO(result);
+                return Ok(toReturn);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         [HttpPost("RecordGame")]
         public async Task<IActionResult> RecordGame([FromBody] FinishedGameDTO gameDTO)

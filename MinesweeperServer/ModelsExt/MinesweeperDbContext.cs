@@ -13,7 +13,10 @@ namespace MinesweeperServer.Models
         {
             return this.Users.FirstOrDefault(x => x.Name == name);
         }
-
+        public async Task<DataList?> GetDataListByName(string name)
+        {
+            return this.DataLists.FirstOrDefault(x => x.Name == name);
+        }
         public async Task<List<Difficulty>> GetDifficultyList()
         {
             return this.Difficulties.Where(x=>x!=null).ToList();

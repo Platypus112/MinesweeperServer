@@ -39,17 +39,17 @@ public partial class MinesweeperDbContext : DbContext
     {
         modelBuilder.Entity<DataList>(entity =>
         {
-            entity.HasKey(e => e.Name).HasName("PK__DataList__72E12F1AFA421DB6");
+            entity.HasKey(e => e.Name).HasName("PK__DataList__72E12F1ADE7AAE57");
         });
 
         modelBuilder.Entity<Difficulty>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Difficul__3213E83FD46DFF47");
+            entity.HasKey(e => e.Id).HasName("PK__Difficul__3213E83FDD68DC43");
         });
 
         modelBuilder.Entity<FinishedGame>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Finished__3213E83FE5F83EA3");
+            entity.HasKey(e => e.Id).HasName("PK__Finished__3213E83F6B4E0569");
 
             entity.HasOne(d => d.Difficulty).WithMany(p => p.FinishedGames)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -62,7 +62,7 @@ public partial class MinesweeperDbContext : DbContext
 
         modelBuilder.Entity<Friend>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Friends__3213E83F7D28A282");
+            entity.HasKey(e => e.Id).HasName("PK__Friends__3213E83FAE5D993F");
 
             entity.HasOne(d => d.Status).WithMany(p => p.Friends)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -79,7 +79,7 @@ public partial class MinesweeperDbContext : DbContext
 
         modelBuilder.Entity<GameReport>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__GameRepo__3213E83F756241FD");
+            entity.HasKey(e => e.Id).HasName("PK__GameRepo__3213E83FE942947C");
 
             entity.HasOne(d => d.Game).WithMany(p => p.GameReports)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -92,17 +92,17 @@ public partial class MinesweeperDbContext : DbContext
 
         modelBuilder.Entity<Status>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Statuses__3213E83FF8729677");
+            entity.HasKey(e => e.Id).HasName("PK__Statuses__3213E83F35B92A2F");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Users__3213E83FBC92C144");
+            entity.HasKey(e => e.Id).HasName("PK__Users__3213E83FD8670F05");
         });
 
         modelBuilder.Entity<UserReport>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__UserRepo__3213E83FC85B5551");
+            entity.HasKey(e => e.Id).HasName("PK__UserRepo__3213E83FF3A038FC");
 
             entity.HasOne(d => d.Status).WithMany(p => p.UserReports)
                 .OnDelete(DeleteBehavior.ClientSetNull)

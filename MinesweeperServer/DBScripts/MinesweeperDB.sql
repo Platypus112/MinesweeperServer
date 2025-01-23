@@ -25,6 +25,7 @@ CREATE TABLE DataLists(--table for classifying different types of lists in the a
 	[report] bit NOT NULL, --true if the table is about reports
 	[games] bit NOT NULL, --true if the table is about games
 	[user] bit NOT NULL, --true if the table is about users
+	[personal] bit NOT NULL, --true if the table should be personalized for the logged user
 	[adminAccess] bit NOT NULL, --true if admin details should be shwon in the table
 )
 

@@ -22,6 +22,9 @@ public partial class DataList
     [Column("user")]
     public bool User { get; set; }
 
+    [Column("personal")]
+    public bool Personal { get; set; }
+
     [Column("adminAccess")]
     public bool AdminAccess { get; set; }
 }
