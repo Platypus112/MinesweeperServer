@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MinesweeperServer.DTO;
 using MinesweeperServer.Models;
 using System.Net;
@@ -18,20 +19,86 @@ namespace MinesweeperServer.Controllers
             webHostEnvironment= webHostEnvironment_;
             context = context_;
         }
-        [HttpGet("GetDataList")]
-        public async Task<IActionResult> GetDataList([FromBody] string name)
+        [HttpGet("GetCollection")]
+        public async Task<IActionResult> GetCollection([FromQuery] string type)
         {
             try
             {
-                DataList? result=await context.GetDataListByName(name);
+                List<Object> result= new List<Object>();
+                if (type.Contains("users") && type.Contains("games")) return Conflict("Collection can't be of type users and games");
+                else if (!(type.Contains("users") || type.Contains("games")))return Conflict("Collection must contain a type of either users or gamers but not both");
 
-                if(result== null) 
-                { 
-                    return NotFound("no datalist found with that name");
+                if (type.Contains("games"))
+                {
+                    if (type.Contains("reports") && type.Contains("admin"))
+                    {
+                        List<GameReport> r = await context.GetAllGameReports();
+                        foreach (GameReport R in r)
+                        {
+                            result.Add(new GameReportDTO(R));
+                        }
+                    }
+                    else if (type.Contains("social"))
+                    {
+                        string? email = HttpContext.Session.GetString("loggedUserEmail");
+                        if (!string.IsNullOrEmpty(email))
+                        {
+                            List<FinishedGame> r = await context.GetAllFriendGamesByEmail(email);
+                            foreach (FinishedGame u in r)
+                            {
+                                result.Add(new GameDataDTO(u));
+                            }
+                        }
+                        else
+                        {
+                            return Conflict("Can't access friend games list without a user logged in");
+                        }
+                    }
+                    else
+                    {
+                        List<FinishedGame> r=await context.GetAllGamesWithData();
+                        foreach(FinishedGame g in r)
+                        {
+                            result.Add(new GameDataDTO(g));
+                        }
+                    }
                 }
-
-                DataListDTO toReturn= new DataListDTO(result);
-                return Ok(toReturn);
+                if (type.Contains("users"))
+                {
+                    if (type.Contains("reports")&& type.Contains("admin"))
+                    {
+                        List<UserReport> r=await context.GetAllUserReports();
+                        foreach (UserReport R in r)
+                        {
+                            result.Add(new UserReportDTO(R));
+                        }
+                    }
+                    else if (type.Contains("social"))
+                    {
+                        string? email = HttpContext.Session.GetString("loggedUserEmail");
+                        if (!string.IsNullOrEmpty(email))
+                        {
+                            List<User> r = await context.GetAllFriendUsersByEmail(email);
+                            foreach (User u in r)
+                            {
+                                result.Add(new UserDataDTO(u));
+                            }
+                        }
+                        else
+                        {
+                            return Conflict("Can't access friend list without a user logged in");
+                        }
+                    }
+                    else
+                    {
+                        List<User> r = await context.GetAllUsers();
+                        foreach (User u in r)
+                        {
+                            result.Add(new UserDataDTO(u));
+                        }
+                    }
+                }
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -56,8 +123,8 @@ namespace MinesweeperServer.Controllers
                 FinishedGame finished = new()
                 {
                     Date = gameDTO.Date,
-                    Difficulty = context.GetDifficultyByDTO(gameDTO.Difficulty),
-                    User = context.GetUserByDTO(gameDTO.User),
+                    Difficulty = await context.GetDifficultyByDTO(gameDTO.Difficulty),
+                    User = await context.GetUserByDTO(gameDTO.User),
                     TimeInSeconds = ((int)gameDTO.TimeInSeconds),
                 };
 

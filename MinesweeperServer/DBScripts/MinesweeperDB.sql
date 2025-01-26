@@ -20,14 +20,6 @@ CREATE TABLE Users(
 	[Admin] bit NOT NULL
 )
 
-CREATE TABLE DataLists(--table for classifying different types of lists in the app
-	[name] nvarchar(50) PRIMARY KEY,--the name of the table
-	[report] bit NOT NULL, --true if the table is about reports
-	[games] bit NOT NULL, --true if the table is about games
-	[user] bit NOT NULL, --true if the table is about users
-	[personal] bit NOT NULL, --true if the table should be personalized for the logged user
-	[adminAccess] bit NOT NULL, --true if admin details should be shwon in the table
-)
 
 CREATE TABLE Difficulties( --table for calssifying different difficulties--
 	[id] int IDENTITY(1,1) PRIMARY KEY, --id for the difficulty
