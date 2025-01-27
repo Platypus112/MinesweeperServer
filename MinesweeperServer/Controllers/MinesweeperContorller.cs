@@ -31,15 +31,15 @@ namespace MinesweeperServer.Controllers
                     string? email = HttpContext.Session.GetString("loggedUserEmail");
                     if (!string.IsNullOrEmpty(email))
                     {
-                        List<User> r = await context.GetAllFriendGamesByEmail(email);
-                        foreach (User u in r)
+                        List<FriendRequest> r = await context.GetAllFriendsRequestsByEmail(email);
+                        foreach (FriendRequest f in r)
                         {
-                            result.Add(new UserDataDTO(u));
+                            result.Add(new FriendRequestDTO(f,email));
                         }
                     }
                     else
                     {
-                        return Conflict("Can't access friend request list without a user logged in");
+                        return Conflict("Can't access friend requests without a user logged in");
                     }
                     return Ok(result);
                 }

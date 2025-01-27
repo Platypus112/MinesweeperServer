@@ -19,7 +19,7 @@ public partial class MinesweeperDbContext : DbContext
 
     public virtual DbSet<FinishedGame> FinishedGames { get; set; }
 
-    public virtual DbSet<Friend> Friends { get; set; }
+    public virtual DbSet<FriendRequest> FriendRequests { get; set; }
 
     public virtual DbSet<GameReport> GameReports { get; set; }
 
@@ -37,12 +37,12 @@ public partial class MinesweeperDbContext : DbContext
     {
         modelBuilder.Entity<Difficulty>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Difficul__3213E83F84F4EADB");
+            entity.HasKey(e => e.Id).HasName("PK__Difficul__3213E83F50893719");
         });
 
         modelBuilder.Entity<FinishedGame>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Finished__3213E83FBF764575");
+            entity.HasKey(e => e.Id).HasName("PK__Finished__3213E83FDD7B4459");
 
             entity.HasOne(d => d.Difficulty).WithMany(p => p.FinishedGames)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -53,26 +53,26 @@ public partial class MinesweeperDbContext : DbContext
                 .HasConstraintName("FK_GameToPlayerID");
         });
 
-        modelBuilder.Entity<Friend>(entity =>
+        modelBuilder.Entity<FriendRequest>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Friends__3213E83F510AA219");
+            entity.HasKey(e => e.Id).HasName("PK__FriendRe__3213E83F69990ECB");
 
-            entity.HasOne(d => d.Status).WithMany(p => p.Friends)
+            entity.HasOne(d => d.Status).WithMany(p => p.FriendRequests)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_RequestToStatus");
 
-            entity.HasOne(d => d.UserRecieving).WithMany(p => p.FriendUserRecievings)
+            entity.HasOne(d => d.UserRecieving).WithMany(p => p.FriendRequestUserRecievings)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_FriendsToUser2ID");
 
-            entity.HasOne(d => d.UserSending).WithMany(p => p.FriendUserSendings)
+            entity.HasOne(d => d.UserSending).WithMany(p => p.FriendRequestUserSendings)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_FriendsToUser1ID");
         });
 
         modelBuilder.Entity<GameReport>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__GameRepo__3213E83F66413A74");
+            entity.HasKey(e => e.Id).HasName("PK__GameRepo__3213E83F8879399E");
 
             entity.HasOne(d => d.Game).WithMany(p => p.GameReports)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -85,17 +85,17 @@ public partial class MinesweeperDbContext : DbContext
 
         modelBuilder.Entity<Status>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Statuses__3213E83FE6235954");
+            entity.HasKey(e => e.Id).HasName("PK__Statuses__3213E83FB321C417");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Users__3213E83FCFBBD544");
+            entity.HasKey(e => e.Id).HasName("PK__Users__3213E83F039DA658");
         });
 
         modelBuilder.Entity<UserReport>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__UserRepo__3213E83F461928B0");
+            entity.HasKey(e => e.Id).HasName("PK__UserRepo__3213E83F6502ECF0");
 
             entity.HasOne(d => d.Status).WithMany(p => p.UserReports)
                 .OnDelete(DeleteBehavior.ClientSetNull)

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MinesweeperServer.Models;
 
-public partial class Friend
+public partial class FriendRequest
 {
     [Key]
     [Column("id")]
@@ -22,14 +22,14 @@ public partial class Friend
     public int Statusid { get; set; }
 
     [ForeignKey("Statusid")]
-    [InverseProperty("Friends")]
+    [InverseProperty("FriendRequests")]
     public virtual Status Status { get; set; } = null!;
 
     [ForeignKey("UserRecievingId")]
-    [InverseProperty("FriendUserRecievings")]
+    [InverseProperty("FriendRequestUserRecievings")]
     public virtual User UserRecieving { get; set; } = null!;
 
     [ForeignKey("UserSendingId")]
-    [InverseProperty("FriendUserSendings")]
+    [InverseProperty("FriendRequestUserSendings")]
     public virtual User UserSending { get; set; } = null!;
 }

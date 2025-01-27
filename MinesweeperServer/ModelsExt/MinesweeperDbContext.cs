@@ -49,18 +49,18 @@ namespace MinesweeperServer.Models
         }
         public async Task<List<User>> GetAllFriendUsersByEmail(string email)
         {
-            User u= this.Users.Include(u => u.FriendUserSendings).ThenInclude(f => f.Status).Include(u => u.FriendUserSendings).ThenInclude(f => f.UserRecieving).FirstOrDefault(x => x.Email == email);
-            return u.FriendUserSendings.Where(f=>f.Status.Name=="approved").Select(f=>f.UserRecieving).ToList();
+            User u= this.Users.Include(u => u.FriendRequestUserSendings).ThenInclude(f => f.Status).Include(u => u.FriendRequestUserSendings).ThenInclude(f => f.UserRecieving).FirstOrDefault(x => x.Email == email);
+            return u.FriendRequestUserSendings.Where(f=>f.Status.Name=="approved").Select(f=>f.UserRecieving).ToList();
         }
         public async Task<List<FinishedGame>> GetAllFriendGamesByEmail(string email)
         {
             return this.FinishedGames.Where(u =>
-            u.User.FriendUserSendings.Any(f=> f.Status.Name=="approved"&&f.UserRecieving.Email==email))
+            u.User.FriendRequestUserSendings.Any(f=> f.Status.Name=="approved"&&f.UserRecieving.Email==email))
                 .Include(g => g.User).Include(g => g.GameReports).ThenInclude(r=>r.Status).Include(g => g.Difficulty).ToList();
         }
-        public async Task<List<Friend>> GetAllFriendsRequestsByEmail(string email)
+        public async Task<List<FriendRequest>> GetAllFriendsRequestsByEmail(string email)
         {
-            return this.Friends.Where(f=>
+            return this.FriendRequests.Where(f=>
                 f.UserRecieving.Email==email||f.UserSending.Email==email)
                 .Include(f=>f.UserRecieving).Include(f=>f.UserSending)
                 .Include(f=>f.Status).ToList();

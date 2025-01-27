@@ -33,10 +33,10 @@ public partial class User
     public virtual ICollection<FinishedGame> FinishedGames { get; set; } = new List<FinishedGame>();
 
     [InverseProperty("UserRecieving")]
-    public virtual ICollection<Friend> FriendUserRecievings { get; set; } = new List<Friend>();
+    public virtual ICollection<FriendRequest> FriendRequestUserRecievings { get; set; } = new List<FriendRequest>();
 
     [InverseProperty("UserSending")]
-    public virtual ICollection<Friend> FriendUserSendings { get; set; } = new List<Friend>();
+    public virtual ICollection<FriendRequest> FriendRequestUserSendings { get; set; } = new List<FriendRequest>();
 
     [InverseProperty("User")]
     public virtual ICollection<UserReport> UserReports { get; set; } = new List<UserReport>();

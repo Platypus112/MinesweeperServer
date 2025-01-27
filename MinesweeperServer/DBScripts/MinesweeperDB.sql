@@ -61,7 +61,7 @@ CREATE TABLE UserReports(
 	CONSTRAINT FK_UserReportToStatus FOREIGN KEY (statusId) REFERENCES Statuses(id), --connects the report to it's status
 )
 
-CREATE TABLE Friends(
+CREATE TABLE FriendRequests(
 	[id] int IDENTITY(1,1) PRIMARY KEY, --id for the friend request
 	[userSendingId] int NOT NULL,
 	[userRecievingId] int NOT NULL,
@@ -90,9 +90,9 @@ INSERT INTO dbo.Difficulties VALUES('Hard',32,18,100);
 INSERT INTO dbo.Difficulties VALUES('Extreme',32,18,150);
 
 go
-INSERT INTO dbo.Friends VALUES(2,1,1)
-INSERT INTO dbo.Friends VALUES(2,3,2)
-INSERT INTO dbo.Friends VALUES(3,2,2)
+INSERT INTO dbo.FriendRequests VALUES(2,1,1)
+INSERT INTO dbo.FriendRequests VALUES(2,3,2)
+INSERT INTO dbo.FriendRequests VALUES(3,2,2)
 
 go
 INSERT INTO dbo.UserReports VALUES(3,1,'too bad')
