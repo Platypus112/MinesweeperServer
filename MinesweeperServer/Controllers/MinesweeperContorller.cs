@@ -26,6 +26,23 @@ namespace MinesweeperServer.Controllers
             {
                 List<Object> result= new List<Object>();
                 if (type.Contains("users") && type.Contains("games")) return Conflict("Collection can't be of type users and games");
+                else if (!(type.Contains("users") || type.Contains("games"))&& type.Contains("social"))
+                {
+                    string? email = HttpContext.Session.GetString("loggedUserEmail");
+                    if (!string.IsNullOrEmpty(email))
+                    {
+                        List<User> r = await context.GetAllFriendGamesByEmail(email);
+                        foreach (User u in r)
+                        {
+                            result.Add(new UserDataDTO(u));
+                        }
+                    }
+                    else
+                    {
+                        return Conflict("Can't access friend request list without a user logged in");
+                    }
+                    return Ok(result);
+                }
                 else if (!(type.Contains("users") || type.Contains("games")))return Conflict("Collection must contain a type of either users or gamers but not both");
 
                 if (type.Contains("games"))
@@ -44,9 +61,9 @@ namespace MinesweeperServer.Controllers
                         if (!string.IsNullOrEmpty(email))
                         {
                             List<FinishedGame> r = await context.GetAllFriendGamesByEmail(email);
-                            foreach (FinishedGame u in r)
+                            foreach (FinishedGame g in r)
                             {
-                                result.Add(new GameDataDTO(u));
+                                result.Add(new GameDataDTO(g));
                             }
                         }
                         else
@@ -91,7 +108,7 @@ namespace MinesweeperServer.Controllers
                     }
                     else
                     {
-                        List<User> r = await context.GetAllUsers();
+                        List<User> r = await context.GetAllUsersWithData();
                         foreach (User u in r)
                         {
                             result.Add(new UserDataDTO(u));
