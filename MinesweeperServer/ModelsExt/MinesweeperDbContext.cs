@@ -2,11 +2,16 @@
 using MinesweeperServer.DTO;
 using MinesweeperServer.Models;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks.Dataflow;
 
 namespace MinesweeperServer.Models
 {
     public partial class MinesweeperDbContext
     {
+        public async Task<FinishedGame> GetGameById(int id)
+        {
+            return this.FinishedGames.First(x=>x.Id == id);
+        }
         public async Task<User?> GetUserByEmail(string email)
         {
             return this.Users.FirstOrDefault(x => x.Email == email);

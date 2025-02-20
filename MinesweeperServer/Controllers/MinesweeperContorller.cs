@@ -19,6 +19,57 @@ namespace MinesweeperServer.Controllers
             webHostEnvironment= webHostEnvironment_;
             context = context_;
         }
+        [HttpPost("ReportGame")]
+        public async Task<IActionResult> ReportGame(GameReportDTO gameReportDTO)
+        {
+            try
+            {
+                FinishedGame game = await context.GetGameById(gameReportDTO.Game.Id);
+                if (game == null)
+                {
+                    return Conflict("Game doesn't exist");
+                }
+
+
+                GameReport report = new()
+                {
+                    StatusId=1,
+                    Description=gameReportDTO.Description,
+                    GameId=game.Id,
+                };
+
+                context.GameReports.Add(report);
+                context.SaveChanges();
+
+                GameReportDTO toReturn = new(report);
+
+                return Ok(toReturn);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("RemoveGame")]
+        public async Task<IActionResult> RemoveGame(int id)
+        {
+            try
+            {
+                FinishedGame game = await context.GetGameById(id);
+                if(game == null)
+                {
+                    return NotFound("no game found with corrosponding id");
+                }
+                context.FinishedGames.Remove(game);
+                context.SaveChanges();
+                return Ok(game);
+            }
+            catch(Exception ex) 
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpGet("GetCollection")]
         public async Task<IActionResult> GetCollection([FromQuery] string type)
         {
@@ -128,11 +179,13 @@ namespace MinesweeperServer.Controllers
         {
             try
             {
-                if (context.GetUserByDTO(gameDTO.User) == null)
+                User user = await context.GetUserByDTO(gameDTO.User);
+                if (user== null)
                 {
                     return Conflict("User doesn't exist");
                 }
-                if (context.GetDifficultyByDTO(gameDTO.Difficulty) == null)
+                Difficulty difficulty = await context.GetDifficultyByDTO(gameDTO.Difficulty);
+                if (difficulty == null)
                 {
                     return Conflict("Difficulty doesn't exist");
                 }
@@ -140,8 +193,8 @@ namespace MinesweeperServer.Controllers
                 FinishedGame finished = new()
                 {
                     Date = gameDTO.Date,
-                    Difficulty = await context.GetDifficultyByDTO(gameDTO.Difficulty),
-                    User = await context.GetUserByDTO(gameDTO.User),
+                    DifficultyId = difficulty.Id,
+                    UserId = user.Id,
                     TimeInSeconds = ((int)gameDTO.TimeInSeconds),
                 };
 
