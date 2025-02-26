@@ -24,7 +24,7 @@ namespace MinesweeperServer.DTO
         public GameReportDTO(GameReport report)
         {
             Id= report.Id;
-            Status=new(report.Status);
+            Status = new(report.Status);
             Description = report.Description;
             Game = new(report.Game);
         }

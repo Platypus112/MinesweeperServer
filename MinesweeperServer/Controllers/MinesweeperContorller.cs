@@ -19,8 +19,27 @@ namespace MinesweeperServer.Controllers
             webHostEnvironment= webHostEnvironment_;
             context = context_;
         }
+        [HttpPost("RemoveGame")]
+        public async Task<IActionResult> RemoveGame([FromQuery]int id)
+        {
+            try
+            {
+                FinishedGame game = await context.GetGameById(id);
+                if(game == null)
+                {
+                    return NotFound("no game found with corrosponding id");
+                }
+                context.FinishedGames.Remove(game);
+                context.SaveChanges();
+                return Ok(game);
+            }
+            catch(Exception ex) 
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPost("ReportGame")]
-        public async Task<IActionResult> ReportGame(GameReportDTO gameReportDTO)
+        public async Task<IActionResult> ReportGame([FromBody]GameReportDTO gameReportDTO)
         {
             try
             {
@@ -41,7 +60,7 @@ namespace MinesweeperServer.Controllers
                 context.GameReports.Add(report);
                 context.SaveChanges();
 
-                GameReportDTO toReturn = new(report);
+                GameReportDTO toReturn = new(context.GameReports.ElementAt(context.GameReports.Count()-1));
 
                 return Ok(toReturn);
 
@@ -51,33 +70,15 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost("RemoveGame")]
-        public async Task<IActionResult> RemoveGame(int id)
-        {
-            try
-            {
-                FinishedGame game = await context.GetGameById(id);
-                if(game == null)
-                {
-                    return NotFound("no game found with corrosponding id");
-                }
-                context.FinishedGames.Remove(game);
-                context.SaveChanges();
-                return Ok(game);
-            }
-            catch(Exception ex) 
-            {
-                return BadRequest(ex.Message);
-            }
-        }
         [HttpGet("GetCollection")]
+        #region GetCollection
         public async Task<IActionResult> GetCollection([FromQuery] string type)
         {
             try
             {
-                List<Object> result= new List<Object>();
+                List<Object> result = new List<Object>();
                 if (type.Contains("users") && type.Contains("games")) return Conflict("Collection can't be of type users and games");
-                else if (!(type.Contains("users") || type.Contains("games"))&& type.Contains("social"))
+                else if (!(type.Contains("users") || type.Contains("games")) && type.Contains("social"))
                 {
                     string? email = HttpContext.Session.GetString("loggedUserEmail");
                     if (!string.IsNullOrEmpty(email))
@@ -85,7 +86,7 @@ namespace MinesweeperServer.Controllers
                         List<FriendRequest> r = await context.GetAllFriendsRequestsByEmail(email);
                         foreach (FriendRequest f in r)
                         {
-                            result.Add(new FriendRequestDTO(f,email));
+                            result.Add(new FriendRequestDTO(f, email));
                         }
                     }
                     else
@@ -94,7 +95,7 @@ namespace MinesweeperServer.Controllers
                     }
                     return Ok(result);
                 }
-                else if (!(type.Contains("users") || type.Contains("games")))return Conflict("Collection must contain a type of either users or gamers but not both");
+                else if (!(type.Contains("users") || type.Contains("games"))) return Conflict("Collection must contain a type of either users or gamers but not both");
 
                 if (type.Contains("games"))
                 {
@@ -124,8 +125,8 @@ namespace MinesweeperServer.Controllers
                     }
                     else
                     {
-                        List<FinishedGame> r=await context.GetAllGamesWithData();
-                        foreach(FinishedGame g in r)
+                        List<FinishedGame> r = await context.GetAllGamesWithData();
+                        foreach (FinishedGame g in r)
                         {
                             result.Add(new GameDataDTO(g));
                         }
@@ -133,9 +134,9 @@ namespace MinesweeperServer.Controllers
                 }
                 if (type.Contains("users"))
                 {
-                    if (type.Contains("reports")&& type.Contains("admin"))
+                    if (type.Contains("reports") && type.Contains("admin"))
                     {
-                        List<UserReport> r=await context.GetAllUserReports();
+                        List<UserReport> r = await context.GetAllUserReports();
                         foreach (UserReport R in r)
                         {
                             result.Add(new UserReportDTO(R));
@@ -172,7 +173,8 @@ namespace MinesweeperServer.Controllers
             {
                 return BadRequest(ex.Message);
             }
-        }
+        } 
+        #endregion
 
         [HttpPost("RecordGame")]
         public async Task<IActionResult> RecordGame([FromBody] FinishedGameDTO gameDTO)
