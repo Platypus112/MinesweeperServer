@@ -4,6 +4,7 @@ namespace MinesweeperServer.DTO
 {
     public class GameDataDTO
     {
+        public int Id { get; set; } 
         public DateTime? Date { get; set; }
         public double TimeInSeconds { get; set; }
         public DifficultyDTO Difficulty { get; set; }
@@ -12,8 +13,9 @@ namespace MinesweeperServer.DTO
 
         public GameDataDTO() { }
 
-        public GameDataDTO(DateTime date_, double timeInSeconds_, DifficultyDTO difficulty_, UserDTO user_, List<GameReportDTO> reports_)
+        public GameDataDTO(int id_, DateTime date_, double timeInSeconds_, DifficultyDTO difficulty_, UserDTO user_, List<GameReportDTO> reports_)
         {
+            Id= id_;
             Date = date_;
             TimeInSeconds = timeInSeconds_;
             Difficulty = difficulty_;
@@ -23,6 +25,7 @@ namespace MinesweeperServer.DTO
 
         public GameDataDTO(FinishedGame game)
         {
+            Id = game.Id;
             Date = game.Date;
             TimeInSeconds = game.TimeInSeconds;
             Difficulty = new(game.Difficulty);

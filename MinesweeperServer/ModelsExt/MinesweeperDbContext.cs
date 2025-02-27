@@ -8,6 +8,10 @@ namespace MinesweeperServer.Models
 {
     public partial class MinesweeperDbContext
     {
+        public async Task<GameReport> GetGameReportById(int id)
+        {
+            return this.GameReports.Include(r=>r.Status).Include(r=>r.Game).ThenInclude(g=>g.User).Include(r => r.Game).ThenInclude(g => g.Difficulty).First(r=> r.Id == id);
+        }
         public async Task<FinishedGame> GetGameById(int id)
         {
             return this.FinishedGames.First(x=>x.Id == id);

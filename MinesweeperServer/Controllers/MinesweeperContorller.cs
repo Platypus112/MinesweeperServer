@@ -19,6 +19,8 @@ namespace MinesweeperServer.Controllers
             webHostEnvironment= webHostEnvironment_;
             context = context_;
         }
+       
+
         [HttpPost("RemoveGame")]
         public async Task<IActionResult> RemoveGame([FromQuery]int id)
         {
@@ -31,13 +33,14 @@ namespace MinesweeperServer.Controllers
                 }
                 context.FinishedGames.Remove(game);
                 context.SaveChanges();
-                return Ok(game);
+                return Ok(new GameDataDTO(game));
             }
             catch(Exception ex) 
             {
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPost("ReportGame")]
         public async Task<IActionResult> ReportGame([FromBody]GameReportDTO gameReportDTO)
         {
@@ -60,7 +63,7 @@ namespace MinesweeperServer.Controllers
                 context.GameReports.Add(report);
                 context.SaveChanges();
 
-                GameReportDTO toReturn = new(context.GameReports.ElementAt(context.GameReports.Count()-1));
+                GameReportDTO toReturn = new(await context.GetGameReportById(report.Id));
 
                 return Ok(toReturn);
 
@@ -70,6 +73,7 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpGet("GetCollection")]
         #region GetCollection
         public async Task<IActionResult> GetCollection([FromQuery] string type)
@@ -274,6 +278,7 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody]UserDTO userDTO)
         {
@@ -307,6 +312,7 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPost("UploadProfileImage")]
         public async Task<IActionResult> UploadProfileImageAsync(IFormFile file)
         {
