@@ -10,6 +10,8 @@ namespace MinesweeperServer.DTO
         public DifficultyDTO Difficulty { get; set; }
         public UserDTO User { get; set; }
         public List<GameReportDTO> Reports { get; set; }
+        public string Time { get { return TimeSpan.FromSeconds(TimeInSeconds).ToString(); } private set { this.Time = value; } }
+
 
         public GameDataDTO() { }
 
