@@ -38,11 +38,11 @@ namespace MinesweeperServer.Models
         }
         public async Task<List<FinishedGame>> GetAllGamesWithData()
         {
-            return this.FinishedGames.Include(g => g.User).Include(g=>g.GameReports).ThenInclude(r=>r.Status).Include(g=>g.Difficulty).ToList();
+            return this.FinishedGames.Include(g => g.User).Include(g=>g.Difficulty).ToList();
         }
         public async Task<List<User>> GetAllUsersWithData()
         {
-            return this.Users.Include(u=>u.UserReports).ThenInclude(r => r.Status).Include(u=>u.FinishedGames).ToList();
+            return this.Users.Include(u=>u.FinishedGames).ThenInclude(g=>g.Difficulty).ToList();
         }
         public async Task<List<UserReport>> GetAllUserReports()
         {
@@ -50,7 +50,7 @@ namespace MinesweeperServer.Models
         }
         public async Task<List<GameReport>> GetAllGameReports()
         {
-            return this.GameReports.Include(r => r.Game).Include(r => r.Status).ToList();
+            return this.GameReports.Include(r => r.Game).ThenInclude(g=>g.Difficulty).Include(r => r.Game).ThenInclude(g => g.User).Include(r => r.Status).ToList();
         }
         public async Task<List<User>> GetAllUsers()
         {
@@ -65,7 +65,7 @@ namespace MinesweeperServer.Models
         {
             return this.FinishedGames.Where(u =>
             u.User.FriendRequestUserSendings.Any(f=> f.Status.Name=="approved"&&f.UserRecieving.Email==email))
-                .Include(g => g.User).Include(g => g.GameReports).ThenInclude(r=>r.Status).Include(g => g.Difficulty).ToList();
+                .Include(g => g.User).Include(g => g.Difficulty).ToList();
         }
         public async Task<List<FriendRequest>> GetAllFriendsRequestsByEmail(string email)
         {

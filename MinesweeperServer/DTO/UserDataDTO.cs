@@ -18,12 +18,12 @@ namespace MinesweeperServer.DTO
 
         public string? Description { get; set; }
 
-        public List<UserReportDTO> Reports { get; set; }
+        //public List<UserReportDTO> Reports { get; set; }
 
         //public List<GameDataDTO> Games { get; set; }
 
         public UserDataDTO() { }
-        public UserDataDTO(string name_,string email_,string password_,string picPath_,bool isAdmin_,string description_, List<UserReportDTO> reports_/*, List<GameDataDTO> games_*/)
+        public UserDataDTO(string name_,string email_,string password_,string picPath_,bool isAdmin_,string description_/*, List<UserReportDTO> reports_*//*, List<GameDataDTO> games_*/)
         {
             Name = name_;
             Email = email_;
@@ -31,7 +31,7 @@ namespace MinesweeperServer.DTO
             PicPath = picPath_;
             IsAdmin = isAdmin_;
             Description = description_;
-            Reports = reports_;
+            //Reports = reports_;
             //Games = games_;
         }
 
@@ -43,11 +43,11 @@ namespace MinesweeperServer.DTO
             Password = user.Password;
             IsAdmin = user.Admin;
             Description = user.Description;
-            Reports = new List<UserReportDTO>();
-            foreach (UserReport r in user.UserReports)
-            {
-                Reports.Add(new UserReportDTO(r));
-            }
+            //Reports = new List<UserReportDTO>();
+            //foreach (UserReport r in user.UserReports)
+            //{
+            //    Reports.Add(new UserReportDTO(r));
+            //}
             //Games = new List<GameDataDTO>();
             //foreach (FinishedGame g in user.FinishedGames)
             //{

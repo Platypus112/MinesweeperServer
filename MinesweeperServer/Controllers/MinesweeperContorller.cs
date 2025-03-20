@@ -19,8 +19,27 @@ namespace MinesweeperServer.Controllers
             webHostEnvironment= webHostEnvironment_;
             context = context_;
         }
-       
 
+        [HttpPost("RemoveReport")]
+        public async Task<IActionResult> RemoveGameReport([FromQuery]int id)
+        {
+            try
+            {
+                GameReport report = await context.GetGameReportById(id);
+                if (report == null)
+                {
+                    return NotFound("no report found with corrosponding id");
+                }
+                context.GameReports.Remove(report);
+                context.SaveChanges();
+                return Ok(new GameReportDTO(report));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+       
         [HttpPost("RemoveGame")]
         public async Task<IActionResult> RemoveGame([FromQuery]int id)
         {
@@ -30,6 +49,10 @@ namespace MinesweeperServer.Controllers
                 if(game == null)
                 {
                     return NotFound("no game found with corrosponding id");
+                }
+                foreach(GameReport report in context.GameReports)
+                {
+                    if(report.GameId==game.Id) context.GameReports.Remove(report);
                 }
                 context.FinishedGames.Remove(game);
                 context.SaveChanges();
@@ -154,7 +177,7 @@ namespace MinesweeperServer.Controllers
                             List<User> r = await context.GetAllFriendUsersByEmail(email);
                             foreach (User u in r)
                             {
-                                result.Add(new UserDataDTO(u));
+                                result.Add(new AppUserDTO(u));
                             }
                         }
                         else
@@ -167,7 +190,7 @@ namespace MinesweeperServer.Controllers
                         List<User> r = await context.GetAllUsersWithData();
                         foreach (User u in r)
                         {
-                            result.Add(new UserDataDTO(u));
+                            result.Add(new AppUserDTO(u));
                         }
                     }
                 }
