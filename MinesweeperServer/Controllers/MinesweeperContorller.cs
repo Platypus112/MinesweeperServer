@@ -20,7 +20,47 @@ namespace MinesweeperServer.Controllers
             context = context_;
         }
 
-        [HttpPost("RemoveReport")]
+        [HttpPost("AcceptGameReport")]
+        public async Task<IActionResult> AcceptGameReport([FromQuery] int id)
+        {
+            try
+            {
+                GameReport report = await context.GetGameReportById(id);
+                if (report == null)
+                {
+                    return NotFound("no report found with corrosponding id");
+                }
+                report.Status.Id = 2;
+                context.SaveChanges();
+                return Ok(new GameReportDTO(report));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("AbsolveGameReport")]
+        public async Task<IActionResult> AbsolveGameReport([FromQuery] int id)
+        {
+            try
+            {
+                GameReport report = await context.GetGameReportById(id);
+                if (report == null)
+                {
+                    return NotFound("no report found with corrosponding id");
+                }
+                report.Status.Id = 3;
+                context.SaveChanges();
+                return Ok(new GameReportDTO(report));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("RemoveGameReport")]
         public async Task<IActionResult> RemoveGameReport([FromQuery]int id)
         {
             try
@@ -177,7 +217,7 @@ namespace MinesweeperServer.Controllers
                             List<User> r = await context.GetAllFriendUsersByEmail(email);
                             foreach (User u in r)
                             {
-                                result.Add(new AppUserDTO(u));
+                                result.Add(new UserDataDTO(u));
                             }
                         }
                         else
@@ -190,7 +230,7 @@ namespace MinesweeperServer.Controllers
                         List<User> r = await context.GetAllUsersWithData();
                         foreach (User u in r)
                         {
-                            result.Add(new AppUserDTO(u));
+                            result.Add(new UserDataDTO(u));
                         }
                     }
                 }

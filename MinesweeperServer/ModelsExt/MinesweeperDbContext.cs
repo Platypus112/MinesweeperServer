@@ -38,11 +38,11 @@ namespace MinesweeperServer.Models
         }
         public async Task<List<FinishedGame>> GetAllGamesWithData()
         {
-            return this.FinishedGames.Include(g => g.User).Include(g=>g.Difficulty).ToList();
+            return this.FinishedGames.Include(g => g.User).Include(g=>g.Difficulty).Include(g => g.GameReports).ThenInclude(r => r.Status).ToList();
         }
         public async Task<List<User>> GetAllUsersWithData()
         {
-            return this.Users.Include(u=>u.FinishedGames).ThenInclude(g=>g.Difficulty).ToList();
+            return this.Users.Include(u=>u.FinishedGames).ThenInclude(g=>g.Difficulty).Include(u=>u.UserReports).ThenInclude(r=>r.Status).ToList();
         }
         public async Task<List<UserReport>> GetAllUserReports()
         {
@@ -58,14 +58,15 @@ namespace MinesweeperServer.Models
         }
         public async Task<List<User>> GetAllFriendUsersByEmail(string email)
         {
-            User u= this.Users.Include(u => u.FriendRequestUserSendings).ThenInclude(f => f.Status).Include(u => u.FriendRequestUserSendings).ThenInclude(f => f.UserRecieving).FirstOrDefault(x => x.Email == email);
-            return u.FriendRequestUserSendings.Where(f=>f.Status.Name=="approved").Select(f=>f.UserRecieving).ToList();
+            return this.Users.Where(u=>u.FriendRequestUserRecievings.Any(f=>f.UserSending.Email == email&&f.Status.Id==2)
+            || u.FriendRequestUserSendings.Any(f => f.UserRecieving.Email == email && f.Status.Id == 2))
+                .Include(u => u.UserReports).ThenInclude(r => r.Status).ToList();
         }
         public async Task<List<FinishedGame>> GetAllFriendGamesByEmail(string email)
         {
             return this.FinishedGames.Where(u =>
             u.User.FriendRequestUserSendings.Any(f=> f.Status.Name=="approved"&&f.UserRecieving.Email==email))
-                .Include(g => g.User).Include(g => g.Difficulty).ToList();
+                .Include(g => g.User).Include(g => g.Difficulty).Include(g=>g.GameReports).ThenInclude(r=>r.Status).ToList();
         }
         public async Task<List<FriendRequest>> GetAllFriendsRequestsByEmail(string email)
         {

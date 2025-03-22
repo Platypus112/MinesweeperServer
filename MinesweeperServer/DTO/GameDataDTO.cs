@@ -10,17 +10,19 @@ namespace MinesweeperServer.DTO
         public DifficultyDTO Difficulty { get; set; }
         public UserDTO User { get; set; }
         public string Time { get { return TimeSpan.FromSeconds(TimeInSeconds).ToString(); } private set { this.Time = value; } }
+        public bool IsDeleted { get; set; }
 
 
         public GameDataDTO() { }
 
-        public GameDataDTO(int id_, DateTime date_, double timeInSeconds_, DifficultyDTO difficulty_, UserDTO user_)
+        public GameDataDTO(int id_, DateTime date_, double timeInSeconds_, DifficultyDTO difficulty_, UserDTO user_, bool isDeleted_)
         {
-            Id= id_;
+            Id = id_;
             Date = date_;
             TimeInSeconds = timeInSeconds_;
             Difficulty = difficulty_;
             User = user_;
+            IsDeleted = isDeleted_;
         }
 
         public GameDataDTO(FinishedGame game)
@@ -30,7 +32,7 @@ namespace MinesweeperServer.DTO
             TimeInSeconds = game.TimeInSeconds;
             Difficulty = new(game.Difficulty);
             User = new(game.User);
-
+            IsDeleted = game.GameReports.Any(r => r.StatusId == 2);
         }
     }
 }
