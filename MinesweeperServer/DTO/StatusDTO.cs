@@ -17,7 +17,7 @@ namespace MinesweeperServer.DTO
         }
         public StatusDTO(Status s)
         {
-            Id = s.Id;
+            Id =  s.Id;
             Name = s.Name;
         }
     }

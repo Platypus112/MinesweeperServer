@@ -65,7 +65,7 @@ namespace MinesweeperServer.Models
         public async Task<List<FinishedGame>> GetAllFriendGamesByEmail(string email)
         {
             return this.FinishedGames.Where(u =>
-            u.User.FriendRequestUserSendings.Any(f=> f.Status.Name=="approved"&&f.UserRecieving.Email==email))
+            u.User.FriendRequestUserSendings.Any(f=> f.Status.Id==2&&f.UserRecieving.Email==email))
                 .Include(g => g.User).Include(g => g.Difficulty).Include(g=>g.GameReports).ThenInclude(r=>r.Status).ToList();
         }
         public async Task<List<FriendRequest>> GetAllFriendsRequestsByEmail(string email)

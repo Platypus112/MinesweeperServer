@@ -21,16 +21,16 @@ namespace MinesweeperServer.Controllers
         }
 
         [HttpPost("AcceptGameReport")]
-        public async Task<IActionResult> AcceptGameReport([FromQuery] int id)
+        public async Task<IActionResult> AcceptGameReport([FromBody]GameReportDTO r)
         {
             try
             {
-                GameReport report = await context.GetGameReportById(id);
+                GameReport report = await context.GetGameReportById(r.Id);
                 if (report == null)
                 {
                     return NotFound("no report found with corrosponding id");
                 }
-                report.Status.Id = 2;
+                report.StatusId = 2;
                 context.SaveChanges();
                 return Ok(new GameReportDTO(report));
             }
@@ -39,18 +39,17 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
         [HttpPost("AbsolveGameReport")]
-        public async Task<IActionResult> AbsolveGameReport([FromQuery] int id)
+        public async Task<IActionResult> AbsolveGameReport([FromBody] GameReportDTO r)
         {
             try
             {
-                GameReport report = await context.GetGameReportById(id);
+                GameReport report = await context.GetGameReportById(r.Id);
                 if (report == null)
                 {
                     return NotFound("no report found with corrosponding id");
                 }
-                report.Status.Id = 3;
+                report.StatusId = 3;
                 context.SaveChanges();
                 return Ok(new GameReportDTO(report));
             }
@@ -61,11 +60,11 @@ namespace MinesweeperServer.Controllers
         }
 
         [HttpPost("RemoveGameReport")]
-        public async Task<IActionResult> RemoveGameReport([FromQuery]int id)
+        public async Task<IActionResult> RemoveGameReport([FromBody] GameReportDTO r)
         {
             try
             {
-                GameReport report = await context.GetGameReportById(id);
+                GameReport report = await context.GetGameReportById(r.Id);
                 if (report == null)
                 {
                     return NotFound("no report found with corrosponding id");
@@ -81,11 +80,11 @@ namespace MinesweeperServer.Controllers
         }
        
         [HttpPost("RemoveGame")]
-        public async Task<IActionResult> RemoveGame([FromQuery]int id)
+        public async Task<IActionResult> RemoveGame([FromBody]GameDataDTO g)
         {
             try
             {
-                FinishedGame game = await context.GetGameById(id);
+                FinishedGame game = await context.GetGameById(g.Id);
                 if(game == null)
                 {
                     return NotFound("no game found with corrosponding id");
