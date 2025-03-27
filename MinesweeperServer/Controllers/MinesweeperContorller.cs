@@ -32,13 +32,14 @@ namespace MinesweeperServer.Controllers
                 }
                 report.StatusId = 2;
                 context.SaveChanges();
-                return Ok(new GameReportDTO(report));
+                return Ok("succussful");
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPost("AbsolveGameReport")]
         public async Task<IActionResult> AbsolveGameReport([FromBody] GameReportDTO r)
         {
@@ -51,7 +52,7 @@ namespace MinesweeperServer.Controllers
                 }
                 report.StatusId = 3;
                 context.SaveChanges();
-                return Ok(new GameReportDTO(report));
+                return Ok("succussful");
             }
             catch (Exception ex)
             {
@@ -71,7 +72,7 @@ namespace MinesweeperServer.Controllers
                 }
                 context.GameReports.Remove(report);
                 context.SaveChanges();
-                return Ok(new GameReportDTO(report));
+                return Ok("succussful");
             }
             catch (Exception ex)
             {
@@ -95,7 +96,7 @@ namespace MinesweeperServer.Controllers
                 }
                 context.FinishedGames.Remove(game);
                 context.SaveChanges();
-                return Ok(new GameDataDTO(game));
+                return Ok("succussful");
             }
             catch(Exception ex) 
             {
