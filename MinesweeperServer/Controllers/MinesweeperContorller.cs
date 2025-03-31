@@ -20,6 +20,7 @@ namespace MinesweeperServer.Controllers
             context = context_;
         }
 
+
         [HttpPost("AcceptGameReport")]
         public async Task<IActionResult> AcceptGameReport([FromBody]GameReportDTO r)
         {
