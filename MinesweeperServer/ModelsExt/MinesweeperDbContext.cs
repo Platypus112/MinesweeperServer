@@ -8,6 +8,22 @@ namespace MinesweeperServer.Models
 {
     public partial class MinesweeperDbContext
     {
+        public async Task<bool> CheckIfFriendsByEmail(string email1,string email2)
+        {
+            return
+                this.FriendRequests.Any(f => f.UserRecieving.Email == email1 && f.UserSending.Email == email2 && f.Status.Name == "approved")
+                &&
+                this.FriendRequests.Any(f => f.UserRecieving.Email == email2 && f.UserSending.Email == email1 && f.Status.Name == "approved");
+        }
+        public async Task RemoveFriendRequestFromUserToUserByEmail(string email1,string email2)
+        {
+            this.FriendRequests.Where(f => (f.UserSending.Email == email1 && f.UserRecieving.Email == email2) || (f.UserRecieving.Email == email1 && f.UserSending.Email == email2)).ExecuteDelete();
+        }
+        public async Task<FriendRequest?> GetFriendRequestByNameDTO(FriendRequestDTO requestDTO)
+        {
+            return this.FriendRequests.Include(f=>f.Status).Include(f=>f.UserRecieving).Include(f=>f.UserSending)
+                .FirstOrDefault(f => f.UserRecieving.Name == requestDTO.UserRecieving.Name && f.UserSending.Name == requestDTO.UserSending.Name); 
+        }
         public async Task<GameReport> GetGameReportById(int id)
         {
             return this.GameReports.Include(r=>r.Status).Include(r=>r.Game).ThenInclude(g=>g.User).Include(r => r.Game).ThenInclude(g => g.Difficulty).First(r=> r.Id == id);

@@ -19,12 +19,194 @@ namespace MinesweeperServer.Controllers
             webHostEnvironment= webHostEnvironment_;
             context = context_;
         }
+        [HttpPost("RemoveFriend")]
+        public async Task<IActionResult> RemoveFriend([FromBody]UserDTO user)
+        {
+            try
+            {
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to block friend reuqest");
+                }
+                User loggedUser = await context.GetUserByEmail(email);
+                User sadUser = await context.GetUserByName(user.Name);
+                if (user == null||sadUser==null)
+                {
+                    return BadRequest("No user sent to remove friend status");
+                }
+                if(!await context.CheckIfFriendsByEmail(loggedUser.Email, sadUser.Email))
+                {
+                    return Conflict("User isn't logged user's friend");
+                }
+
+                await context.RemoveFriendRequestFromUserToUserByEmail(loggedUser.Email, sadUser.Email);
+                context.SaveChanges();
+
+                return Ok(sadUser);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("BlockUser")]
+        public async Task<IActionResult> BlockUser([FromBody]UserDTO user)
+        {
+            try
+            {
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to block friend reuqest");
+                }
+                User loggedUser=await context.GetUserByEmail(email);
+                User blockedUser=await context.GetUserByName(user.Name);
+                if (user == null||blockedUser==null)
+                {
+                    return BadRequest("No user sent to block");
+                }
+                else if (loggedUser.Email==blockedUser.Email)
+                {
+                    return Conflict("Cannot block yourself");
+                }
+                await context.RemoveFriendRequestFromUserToUserByEmail(loggedUser.Email, blockedUser.Email);
+                FriendRequest blockRequest = new()
+                {
+                    UserRecievingId = blockedUser.Id,
+                    UserSendingId = loggedUser.Id,
+                    Statusid = 3,
+                };
+                context.FriendRequests.Add(blockRequest);
+                context.SaveChanges();
+
+                return Ok(new AppUserDTO(blockedUser));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("AcceptFriendRequest")]
+        public async Task<IActionResult> AcceptFriendRequest([FromBody]FriendRequestDTO requestDTO)
+        {
+            try
+            {
+                if (requestDTO == null || requestDTO.UserSending == null || requestDTO.UserRecieving == null)
+                {
+                    return BadRequest("No request sent");
+                }
+                User recieving = await context.GetUserByName(requestDTO.UserRecieving.Name);
+                if (recieving == null)
+                {
+                    return NotFound("No recieving user found");
+                }
+                User sending = await context.GetUserByName(requestDTO.UserSending.Name);
+                if (sending == null)
+                {
+                    return NotFound("No sending user found");
+                }
+                FriendRequest request = await context.GetFriendRequestByNameDTO(requestDTO);
+                if(request == null)
+                {
+                    return NotFound("Request doesn't exist");
+                }
+                if(request.Status.Name!="pending")
+                {
+                    return Conflict("Request isn't pending");
+                }
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to accept friend reuqest");
+                }
+                else if ((await context.GetUserByEmail(email)).Id != recieving.Id)
+                {
+                    return Unauthorized("cannot accpet friend request from a different user than the one logged in");
+                }
+                request.Statusid = 2;
+                FriendRequest other = new()
+                {
+                    UserRecievingId = request.UserSendingId,
+                    UserSendingId = request.UserRecievingId,
+                    Statusid = 2,
+                };
+                context.FriendRequests.Add(other);
+                context.SaveChanges();
+
+                return Ok(new AppUserDTO(recieving));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("SendFriendRequest")]
+        public async Task<IActionResult> SendFriendRequest([FromBody] FriendRequestDTO request)
+        {
+            try
+            {
+                if (request == null|| request.UserSending == null|| request.UserRecieving == null)
+                {
+                    return BadRequest("No request sent");
+                }
+                User recieving = await context.GetUserByName(request.UserRecieving.Name);
+                if (recieving == null)
+                {
+                    return NotFound("No recieving user found");
+                }
+                User sending = await context.GetUserByName(request.UserSending.Name);
+                if (sending == null)
+                {
+                    return NotFound("No sending user found");
+                }
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to send friend reuqest");
+                }
+                else if ((await context.GetUserByEmail(email)).Id!=sending.Id)
+                {
+                    return Unauthorized("cannot send friend request from a different user than the one logged in");
+                }
+                FriendRequest check = await context.GetFriendRequestByNameDTO(request);
+                if (check != null)
+                {
+                    if (check.Statusid == 2) return Conflict("Users are already friends");
+                    else if (check.Statusid == 3) return Unauthorized("User had blocked sending user");
+                    else return Conflict("request already sent");
+                }
+
+                FriendRequest addRequest = new()
+                {
+                    UserRecievingId = recieving.Id,
+                    UserSendingId= sending.Id,
+                    Statusid=1,
+                };
+                context.Add(addRequest);
+                context.SaveChanges();
+                return Ok("Friend request sent successfuly");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         [HttpPost("AcceptGameReport")]
         public async Task<IActionResult> AcceptGameReport([FromBody]GameReportDTO r)
         {
             try
             {
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to accept report");
+                }
+                else if (!(await context.GetUserByEmail(email)).Admin)
+                {
+                    return Unauthorized("cannot accept report without being an admin");
+                }
                 GameReport report = await context.GetGameReportById(r.Id);
                 if (report == null)
                 {
@@ -45,6 +227,15 @@ namespace MinesweeperServer.Controllers
         {
             try
             {
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to absolve report");
+                }
+                else if (!(await context.GetUserByEmail(email)).Admin)
+                {
+                    return Unauthorized("cannot absolve report without being an admin");
+                }
                 GameReport report = await context.GetGameReportById(r.Id);
                 if (report == null)
                 {
@@ -65,6 +256,15 @@ namespace MinesweeperServer.Controllers
         {
             try
             {
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to remove report");
+                }
+                else if (!(await context.GetUserByEmail(email)).Admin)
+                {
+                    return Unauthorized("cannot remove report without being an admin");
+                }
                 GameReport report = await context.GetGameReportById(r.Id);
                 if (report == null)
                 {
@@ -85,6 +285,15 @@ namespace MinesweeperServer.Controllers
         {
             try
             {
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to remove game");
+                }
+                else if (!(await context.GetUserByEmail(email)).Admin)
+                {
+                    return Unauthorized("cannot remove game without being an admin");
+                }
                 FinishedGame game = await context.GetGameById(g.Id);
                 if(game == null)
                 {
@@ -114,7 +323,11 @@ namespace MinesweeperServer.Controllers
                 {
                     return Conflict("Game doesn't exist");
                 }
-
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to report game");
+                }
 
                 GameReport report = new()
                 {
@@ -253,6 +466,15 @@ namespace MinesweeperServer.Controllers
                 {
                     return Conflict("User doesn't exist");
                 }
+                string email= HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to record game");
+                }
+                else if (email != user.Email)
+                {
+                    return Unauthorized("cannot record game for other players");
+                }
                 Difficulty difficulty = await context.GetDifficultyByDTO(gameDTO.Difficulty);
                 if (difficulty == null)
                 {
@@ -311,9 +533,13 @@ namespace MinesweeperServer.Controllers
         {
             try
             {
-                if (await context.GetUserByEmail(userDTO.Email) != null || await context.GetUserByName(userDTO.Name) != null)
+                if (await context.GetUserByEmail(userDTO.Email) != null)
                 {
-                    return Conflict("this username or email have already been used");
+                    return Conflict("this email has already been used");
+                }
+                if(await context.GetUserByName(userDTO.Name) != null)
+                {
+                    return Conflict("this username has already been used");
                 }
 
                 HttpContext.Session.Clear();

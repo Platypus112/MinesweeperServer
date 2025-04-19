@@ -6,16 +6,16 @@ namespace MinesweeperServer.DTO
 {
     public class FriendRequestDTO
     {
-        public AppUserDTO UserSending { get; set; }
+        public UserDTO UserSending { get; set; }
 
-        public AppUserDTO UserRecieving { get; set; }
+        public UserDTO UserRecieving { get; set; }
 
         public StatusDTO Status { get; set; }
 
         public bool Recieving { get; set; }
 
         public FriendRequestDTO() { }
-        public FriendRequestDTO(AppUserDTO userSending_,AppUserDTO userRecieving_,StatusDTO status_,bool recieving_)
+        public FriendRequestDTO(UserDTO userSending_,UserDTO userRecieving_,StatusDTO status_,bool recieving_)
         {
             UserSending = userSending_;
             UserRecieving = userRecieving_;
