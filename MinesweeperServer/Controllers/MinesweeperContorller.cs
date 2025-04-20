@@ -19,6 +19,64 @@ namespace MinesweeperServer.Controllers
             webHostEnvironment= webHostEnvironment_;
             context = context_;
         }
+        [HttpPost("UnblockUser")]
+        public async Task<IActionResult> UnblockUser([FromBody]AppUserDTO user)
+        {
+            try
+            {
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to unblock user");
+                }
+                User logged=await context.GetUserByEmail(email);
+                if(await context.CheckIfUserIsBlockedByName(logged.Name,user.Name))
+                {
+                    return Conflict("logged user isn't blocking given user");
+                }
+                FriendRequest blockRequest = await context.GetFriendRequestByNameDTO(new FriendRequestDTO()
+                {
+                    UserSending=new()
+                    {
+                        Name= logged.Name
+                    },
+                    UserRecieving = new()
+                    {
+                        Name=user.Name
+                    },
+                });
+                context.FriendRequests.Remove(blockRequest);
+                context.SaveChanges();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("GetFriendRequests")]
+        public async Task<IActionResult> GetFriendRequests()
+        {
+            try
+            {
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to get all his friends");
+                }
+                List<FriendRequest> friendRequests = await context.GetAllFriendsRequestsByEmail(email);
+                List<FriendRequestDTO> result = new();
+                foreach(FriendRequest request in friendRequests)
+                {
+                    result.Add(new(request,email));
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPost("RemoveFriend")]
         public async Task<IActionResult> RemoveFriend([FromBody]UserDTO user)
         {
@@ -87,6 +145,53 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost("DeclineFriendRequest")]
+        public async Task<IActionResult> DeclineFriendRequest([FromBody]FriendRequestDTO requestDTO)
+        {
+            try
+            {
+                if (requestDTO == null || requestDTO.UserSending == null || requestDTO.UserRecieving == null)
+                {
+                    return BadRequest("No request sent");
+                }
+                User recieving = await context.GetUserByName(requestDTO.UserRecieving.Name);
+                if (recieving == null)
+                {
+                    return NotFound("No recieving user found");
+                }
+                User sending = await context.GetUserByName(requestDTO.UserSending.Name);
+                if (sending == null)
+                {
+                    return NotFound("No sending user found");
+                }
+                FriendRequest request = await context.GetFriendRequestByNameDTO(requestDTO);
+                if (request == null)
+                {
+                    return NotFound("Request doesn't exist");
+                }
+                if (request.Status.Name != "pending")
+                {
+                    return Conflict("Request isn't pending");
+                }
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to decline friend reuqest");
+                }
+                else if ((await context.GetUserByEmail(email)).Id != recieving.Id)
+                {
+                    return Unauthorized("cannot decline friend request from a different user than the one logged in");
+                }
+                context.FriendRequests.Remove(request);
+                context.SaveChanges();
+
+                return Ok(new AppUserDTO(recieving));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPost("AcceptFriendRequest")]
         public async Task<IActionResult> AcceptFriendRequest([FromBody]FriendRequestDTO requestDTO)
         {
@@ -111,7 +216,7 @@ namespace MinesweeperServer.Controllers
                 {
                     return NotFound("Request doesn't exist");
                 }
-                if(request.Status.Name!="pending")
+                if (request.Status.Name!="pending")
                 {
                     return Conflict("Request isn't pending");
                 }
@@ -120,7 +225,8 @@ namespace MinesweeperServer.Controllers
                 {
                     return Unauthorized("User must be logged to accept friend reuqest");
                 }
-                else if ((await context.GetUserByEmail(email)).Id != recieving.Id)
+                User logged = await context.GetUserByEmail(email);
+                if (logged.Id != recieving.Id)
                 {
                     return Unauthorized("cannot accpet friend request from a different user than the one logged in");
                 }
@@ -134,7 +240,7 @@ namespace MinesweeperServer.Controllers
                 context.FriendRequests.Add(other);
                 context.SaveChanges();
 
-                return Ok(new AppUserDTO(recieving));
+                return Ok(new AppUserDTO(sending));
             }
             catch (Exception ex)
             {
@@ -169,11 +275,19 @@ namespace MinesweeperServer.Controllers
                 {
                     return Unauthorized("cannot send friend request from a different user than the one logged in");
                 }
+                if((await context.CheckIfUserIsBlockedByName(recieving.Name, sending.Name)))
+                {
+                    return Unauthorized("User had been blocked by recieving user");
+                }
+                if (sending.UserReports.Where(r => r.Status.Name == "Approved").Count() > 0)
+                {
+                    return Unauthorized("can't make friends while being a criminal");
+                }
                 FriendRequest check = await context.GetFriendRequestByNameDTO(request);
                 if (check != null)
                 {
                     if (check.Statusid == 2) return Conflict("Users are already friends");
-                    else if (check.Statusid == 3) return Unauthorized("User had blocked sending user");
+                    else if (check.Statusid == 3) return Unauthorized("User had blocked recieving user");
                     else return Conflict("request already sent");
                 }
 
@@ -192,8 +306,6 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
         [HttpPost("AcceptGameReport")]
         public async Task<IActionResult> AcceptGameReport([FromBody]GameReportDTO r)
         {
@@ -437,6 +549,22 @@ namespace MinesweeperServer.Controllers
                         else
                         {
                             return Conflict("Can't access friend list without a user logged in");
+                        }
+                    }
+                    else if (type.Contains("blocked"))
+                    {
+                        string? email = HttpContext.Session.GetString("loggedUserEmail");
+                        if (!string.IsNullOrEmpty(email))
+                        {
+                            List<User> r = await context.GetAllBlockedUsersByEmail(email);
+                            foreach (User u in r)
+                            {
+                                result.Add(new UserDataDTO(u));
+                            }
+                        }
+                        else
+                        {
+                            return Conflict("Can't access block list without a user logged in");
                         }
                     }
                     else

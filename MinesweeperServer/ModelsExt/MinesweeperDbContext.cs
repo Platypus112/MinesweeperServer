@@ -8,6 +8,11 @@ namespace MinesweeperServer.Models
 {
     public partial class MinesweeperDbContext
     {
+        public async Task<bool> CheckIfUserIsBlockedByName(string user, string blocked)
+        {
+            return
+                this.FriendRequests.Any(f => f.UserSending.Name == user && f.UserRecieving.Name == blocked && f.Status.Name == "declined");
+        }
         public async Task<bool> CheckIfFriendsByEmail(string email1,string email2)
         {
             return
@@ -34,11 +39,11 @@ namespace MinesweeperServer.Models
         }
         public async Task<User?> GetUserByEmail(string email)
         {
-            return this.Users.FirstOrDefault(x => x.Email == email);
+            return this.Users.Include(u=>u.UserReports).ThenInclude(r=>r.Status).FirstOrDefault(x => x.Email == email);
         }
         public async Task<User?> GetUserByName(string name)
         {
-            return this.Users.FirstOrDefault(x => x.Name == name);
+            return this.Users.Include(u => u.UserReports).ThenInclude(r => r.Status).FirstOrDefault(x => x.Name == name);
         }
         public async Task<List<Difficulty>> GetDifficultyList()
         {
@@ -50,7 +55,7 @@ namespace MinesweeperServer.Models
         }
         public async Task<User> GetUserByDTO(UserDTO dto)
         {
-            return this.Users.FirstOrDefault(x => x.Name == dto.Name);
+            return this.Users.Include(u => u.UserReports).ThenInclude(r => r.Status).FirstOrDefault(x => x.Name == dto.Name);
         }
         public async Task<List<FinishedGame>> GetAllGamesWithData()
         {
@@ -76,6 +81,11 @@ namespace MinesweeperServer.Models
         {
             return this.Users.Where(u=>u.FriendRequestUserRecievings.Any(f=>f.UserSending.Email == email&&f.Status.Id==2)
             || u.FriendRequestUserSendings.Any(f => f.UserRecieving.Email == email && f.Status.Id == 2))
+                .Include(u => u.UserReports).ThenInclude(r => r.Status).ToList();
+        }
+        public async Task<List<User>> GetAllBlockedUsersByEmail(string email)
+        {
+            return this.Users.Where(u => u.FriendRequestUserRecievings.Any(f => f.UserSending.Email == email && f.Status.Id == 3))
                 .Include(u => u.UserReports).ThenInclude(r => r.Status).ToList();
         }
         public async Task<List<FinishedGame>> GetAllFriendGamesByEmail(string email)
