@@ -25,12 +25,12 @@ namespace MinesweeperServer.Controllers
             try
             {
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to unblock user");
                 }
                 User logged=await context.GetUserByEmail(email);
-                if(await context.CheckIfUserIsBlockedByName(logged.Name,user.Name))
+                if(!(await context.CheckIfUserIsBlockedByName(logged.Name,user.Name)))
                 {
                     return Conflict("logged user isn't blocking given user");
                 }
@@ -54,13 +54,13 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("GetFriendRequests")]
-        public async Task<IActionResult> GetFriendRequests()
+        [HttpGet("GetAllFriendRequests")]
+        public async Task<IActionResult> GetAllFriendRequests()
         {
             try
             {
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to get all his friends");
                 }
@@ -83,7 +83,7 @@ namespace MinesweeperServer.Controllers
             try
             {
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to block friend reuqest");
                 }
@@ -101,7 +101,7 @@ namespace MinesweeperServer.Controllers
                 await context.RemoveFriendRequestFromUserToUserByEmail(loggedUser.Email, sadUser.Email);
                 context.SaveChanges();
 
-                return Ok(sadUser);
+                return Ok(new UserDataDTO(sadUser));
             }
             catch (Exception ex)
             {
@@ -114,7 +114,7 @@ namespace MinesweeperServer.Controllers
             try
             {
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to block friend reuqest");
                 }
@@ -174,7 +174,7 @@ namespace MinesweeperServer.Controllers
                     return Conflict("Request isn't pending");
                 }
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to decline friend reuqest");
                 }
@@ -221,7 +221,7 @@ namespace MinesweeperServer.Controllers
                     return Conflict("Request isn't pending");
                 }
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to accept friend reuqest");
                 }
@@ -267,7 +267,7 @@ namespace MinesweeperServer.Controllers
                     return NotFound("No sending user found");
                 }
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to send friend reuqest");
                 }
