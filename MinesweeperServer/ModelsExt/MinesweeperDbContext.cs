@@ -8,6 +8,18 @@ namespace MinesweeperServer.Models
 {
     public partial class MinesweeperDbContext
     {
+        public async Task<UserReport> GetUserReportById(int id)
+        {
+            return this.UserReports.Include(r => r.User).Include(r => r.Status).FirstOrDefault(r => r.User.Id == id);
+        }
+        public async Task<User> GetUserById(int id)
+        {
+            return this.Users.First(u=>u.Id == id);
+        }
+        public async Task<List<FinishedGame>> GetAllGamesByUsername(string username)
+        {
+            return this.FinishedGames.Include(g=>g.User).Include(g=>g.Difficulty).Where(g => g.User.Name == username).ToList();
+        }
         public async Task<bool> CheckIfUserIsBlockedByName(string user, string blocked)
         {
             return

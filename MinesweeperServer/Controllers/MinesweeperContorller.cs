@@ -19,6 +19,226 @@ namespace MinesweeperServer.Controllers
             webHostEnvironment= webHostEnvironment_;
             context = context_;
         }
+        [HttpPost("AcceptUserReport")]
+        public async Task<IActionResult> AcceptUserReport([FromBody] UserReportDTO r)
+        {
+            try
+            {
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to accept report");
+                }
+                else if (!(await context.GetUserByEmail(email)).Admin)
+                {
+                    return Unauthorized("cannot accept report without being an admin");
+                }
+                UserReport report = await context.GetUserReportById(r.Id);
+                if (report == null)
+                {
+                    return NotFound("no report found with corrosponding id");
+                }
+                report.StatusId = 2;
+                context.SaveChanges();
+                return Ok("succussful");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("AbsolveUserReport")]
+        public async Task<IActionResult> AbsolveUserReport([FromBody] UserReportDTO r)
+        {
+            try
+            {
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to absolve report");
+                }
+                else if (!(await context.GetUserByEmail(email)).Admin)
+                {
+                    return Unauthorized("cannot absolve report without being an admin");
+                }
+                UserReport report = await context.GetUserReportById(r.Id);
+                if (report == null)
+                {
+                    return NotFound("no report found with corrosponding id");
+                }
+                report.StatusId = 3;
+                context.SaveChanges();
+                return Ok("succussful");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("RemoveUserReport")]
+        public async Task<IActionResult> RemoveUserReport([FromBody]UserReportDTO r)
+        {
+            try
+            {
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to remove report");
+                }
+                else if (!(await context.GetUserByEmail(email)).Admin)
+                {
+                    return Unauthorized("cannot remove report without being an admin");
+                }
+                UserReport report = await context.GetUserReportById(r.Id);
+                if (report == null)
+                {
+                    return NotFound("no report found with corrosponding id");
+                }
+                context.UserReports.Remove(report);
+                context.SaveChanges();
+                return Ok("succussful");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("RemoveUser")]
+        public async Task<IActionResult> RemoveUser([FromBody]UserDataDTO u)
+        {
+            try
+            {
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to remove game");
+                }
+                else if (!(await context.GetUserByEmail(email)).Admin)
+                {
+                    return Unauthorized("cannot remove game without being an admin");
+                }
+                User user = await context.GetUserById(u.Id.Value);
+                if (user == null)
+                {
+                    return NotFound("no user found with corrosponding id");
+                }
+                foreach (UserReport report in context.UserReports)
+                {
+                    if (report.UserId == user.Id) context.UserReports.Remove(report);
+                }
+                context.Users.Remove(user);
+                context.SaveChanges();
+                return Ok("succussful");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("ReportUser")]
+        public async Task<IActionResult> ReportUser([FromBody]UserReportDTO userReportDTO)
+        {
+            try
+            {
+                User user = await context.GetUserById(userReportDTO.User.Id.Value);
+                if (user == null)
+                {
+                    return Conflict("User doesn't exist");
+                }
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (!string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to report game");
+                }
+
+                UserReport report = new()
+                {
+                    StatusId = 1,
+                    UserId = user.Id,
+                    Description=userReportDTO.Description,
+                };
+
+                context.UserReports.Add(report);
+                context.SaveChanges();
+
+                UserReportDTO toReturn = new(await context.GetUserReportById(report.Id));
+
+                return Ok(toReturn);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("GetRecords")]
+        public async Task<IActionResult> GetRecords([FromQuery]string username) 
+        {
+            try
+            {
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to get records");
+                }
+                List<FinishedGame> finishedGames = await context.GetAllGamesByUsername(username);
+                List<FinishedGameDTO> games = new();
+                for(int i = 1;i <= 5; i++)
+                {
+                    FinishedGame toAdd = finishedGames.Where(g => g.Difficulty.Id == i).OrderByDescending(g => g.TimeInSeconds).First();
+                    if(toAdd != null)
+                    {
+                        games.Add(new(toAdd));
+                    }
+                }
+                return Ok(games);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("EditUser")]
+        public async Task<IActionResult> EditUser([FromBody]AppUserDTO user)
+        {
+            try
+            {
+                string email = HttpContext.Session.GetString("loggedUserEmail");
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized("User must be logged to edit user");
+                }
+                User logged = await context.GetUserByEmail(email);
+                if (!(await context.CheckIfUserIsBlockedByName(logged.Name, user.Name)))
+                {
+                    return Conflict("logged user can't edit a different user's details");
+                }
+
+                if (await context.GetUserByName(user.Name) != null)
+                {
+                    return Conflict("this username has already been used");
+                }
+                logged.Name = user.Name;
+                logged.Password = user.Password;
+                logged.Description= user.Description;
+                logged.PicPath= user.PicPath;
+                context.SaveChanges();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost("UnblockUser")]
         public async Task<IActionResult> UnblockUser([FromBody]AppUserDTO user)
         {
@@ -54,6 +274,7 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpGet("GetAllFriendRequests")]
         public async Task<IActionResult> GetAllFriendRequests()
         {
@@ -77,6 +298,7 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPost("RemoveFriend")]
         public async Task<IActionResult> RemoveFriend([FromBody]UserDTO user)
         {
@@ -108,6 +330,7 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPost("BlockUser")]
         public async Task<IActionResult> BlockUser([FromBody]UserDTO user)
         {
@@ -145,6 +368,7 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPost("DeclineFriendRequest")]
         public async Task<IActionResult> DeclineFriendRequest([FromBody]FriendRequestDTO requestDTO)
         {
@@ -192,6 +416,7 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPost("AcceptFriendRequest")]
         public async Task<IActionResult> AcceptFriendRequest([FromBody]FriendRequestDTO requestDTO)
         {
@@ -247,6 +472,7 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPost("SendFriendRequest")]
         public async Task<IActionResult> SendFriendRequest([FromBody] FriendRequestDTO request)
         {
@@ -306,6 +532,7 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPost("AcceptGameReport")]
         public async Task<IActionResult> AcceptGameReport([FromBody]GameReportDTO r)
         {
@@ -392,7 +619,7 @@ namespace MinesweeperServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
-       
+
         [HttpPost("RemoveGame")]
         public async Task<IActionResult> RemoveGame([FromBody]GameDataDTO g)
         {
@@ -543,7 +770,10 @@ namespace MinesweeperServer.Controllers
                             List<User> r = await context.GetAllFriendUsersByEmail(email);
                             foreach (User u in r)
                             {
-                                result.Add(new UserDataDTO(u));
+                                result.Add(new UserDataDTO(u)
+                                {
+                                    PicPath = GetProfileImageVirtualPath(u.Id)
+                                });
                             }
                         }
                         else
@@ -559,7 +789,10 @@ namespace MinesweeperServer.Controllers
                             List<User> r = await context.GetAllBlockedUsersByEmail(email);
                             foreach (User u in r)
                             {
-                                result.Add(new UserDataDTO(u));
+                                result.Add(new UserDataDTO(u)
+                                {
+                                    PicPath = GetProfileImageVirtualPath(u.Id)
+                                });
                             }
                         }
                         else
@@ -572,7 +805,10 @@ namespace MinesweeperServer.Controllers
                         List<User> r = await context.GetAllUsersWithData();
                         foreach (User u in r)
                         {
-                            result.Add(new UserDataDTO(u));
+                            result.Add(new UserDataDTO(u)
+                            {
+                                PicPath = GetProfileImageVirtualPath(u.Id)
+                            });
                         }
                     }
                 }
