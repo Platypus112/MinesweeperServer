@@ -216,7 +216,7 @@ namespace MinesweeperServer.Controllers
                     return Unauthorized("User must be logged to edit user");
                 }
                 User logged = await context.GetUserByEmail(email);
-                if (!(await context.CheckIfUserIsBlockedByName(logged.Name, user.Name)))
+                if (logged.Email!=user.Email)
                 {
                     return Conflict("logged user can't edit a different user's details");
                 }
