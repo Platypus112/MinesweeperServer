@@ -19,6 +19,30 @@ namespace MinesweeperServer.Controllers
             webHostEnvironment= webHostEnvironment_;
             context = context_;
         }
+        [HttpGet("GetUserGames")]
+        public async Task<IActionResult> GetUserGames([FromQuery]string email)
+        {
+            try
+            {
+                string emailLogged = HttpContext.Session.GetString("loggedUserEmail");
+                if (string.IsNullOrEmpty(emailLogged))
+                {
+                    return Unauthorized("User must be logged to get games");
+                }
+                List<FinishedGame> finishedGames = await context.GetAllGamesByEmail(email);
+                List<GameDataDTO> games = new();
+                foreach (FinishedGame toAdd in finishedGames)
+                {
+                    games.Add(new(toAdd));
+                }
+                return Ok(games);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPost("AcceptUserReport")]
         public async Task<IActionResult> AcceptUserReport([FromBody] UserReportDTO r)
         {
@@ -107,7 +131,7 @@ namespace MinesweeperServer.Controllers
         }
 
         [HttpPost("RemoveUser")]
-        public async Task<IActionResult> RemoveUser([FromBody]UserDataDTO u)
+        public async Task<IActionResult> RemoveUser([FromBody]AppUserDTO u)
         {
             try
             {
@@ -177,23 +201,28 @@ namespace MinesweeperServer.Controllers
         }
 
         [HttpGet("GetRecords")]
-        public async Task<IActionResult> GetRecords([FromQuery]string username) 
+        public async Task<IActionResult> GetRecords([FromQuery]string email) 
         {
             try
             {
-                string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (string.IsNullOrEmpty(email))
+                string emailLogged = HttpContext.Session.GetString("loggedUserEmail");
+                if (string.IsNullOrEmpty(emailLogged))
                 {
                     return Unauthorized("User must be logged to get records");
                 }
-                List<FinishedGame> finishedGames = await context.GetAllGamesByUsername(username);
-                List<FinishedGameDTO> games = new();
+                List<FinishedGame> finishedGames = await context.GetAllGamesByEmail(email);
+                List<GameDataDTO> games = new();
                 for(int i = 1;i <= 5; i++)
                 {
-                    FinishedGame toAdd = finishedGames.Where(g => g.Difficulty.Id == i).OrderByDescending(g => g.TimeInSeconds).First();
+                    FinishedGame toAdd=null;
+                    for (int j = 0; j < finishedGames.Count; j++)
+                    {
+                        toAdd = finishedGames.Where(g => g.Difficulty.Id == i).OrderByDescending(g => g.TimeInSeconds).ToList()[j];
+                        if(!toAdd.GameReports.Any(r => r.StatusId == 2))j=finishedGames.Count;
+                    }
                     if(toAdd != null)
                     {
-                        games.Add(new(toAdd));
+                        GameDataDTO toAddDTO = new(toAdd);
                     }
                 }
                 return Ok(games);

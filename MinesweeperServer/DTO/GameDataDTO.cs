@@ -32,7 +32,7 @@ namespace MinesweeperServer.DTO
             TimeInSeconds = game.TimeInSeconds;
             Difficulty = new(game.Difficulty);
             User = new(game.User);
-            IsDeleted = game.GameReports.Any(r => r.StatusId == 2);
+            IsDeleted = game.GameReports.Any(r => r.StatusId == 2)||game.User.UserReports.Any(r=>r.StatusId==2);
         }
     }
 }

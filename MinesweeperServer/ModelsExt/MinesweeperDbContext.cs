@@ -16,9 +16,13 @@ namespace MinesweeperServer.Models
         {
             return this.Users.First(u=>u.Id == id);
         }
+        public async Task<List<FinishedGame>> GetAllGamesByEmail(string email)
+        {
+            return this.FinishedGames.Include(g=>g.GameReports).ThenInclude(r=>r.Status).Include(g => g.User).Include(g => g.Difficulty).Where(g => g.User.Email == email).ToList();
+        }
         public async Task<List<FinishedGame>> GetAllGamesByUsername(string username)
         {
-            return this.FinishedGames.Include(g=>g.User).Include(g=>g.Difficulty).Where(g => g.User.Name == username).ToList();
+            return this.FinishedGames.Include(g => g.GameReports).ThenInclude(r => r.Status).Include(g=>g.User).Include(g=>g.Difficulty).Where(g => g.User.Name == username).ToList();
         }
         public async Task<bool> CheckIfUserIsBlockedByName(string user, string blocked)
         {
