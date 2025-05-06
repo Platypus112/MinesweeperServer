@@ -19,6 +19,19 @@ namespace MinesweeperServer.Controllers
             webHostEnvironment= webHostEnvironment_;
             context = context_;
         }
+        [HttpPost("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                HttpContext.Session.Clear();
+                return Ok("Session cleared");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpGet("GetUserGames")]
         public async Task<IActionResult> GetUserGames([FromQuery]string email)
         {
