@@ -11,7 +11,6 @@ namespace MinesweeperServer.DTO
 
         public string Password { get; set; }
 
-        public string PicPath { get; set; }
 
         public UserDTO() { }
 
@@ -20,14 +19,12 @@ namespace MinesweeperServer.DTO
             Name = name_;
             Email = email_;
             Password = password_;
-            PicPath = picPath_;
         }
         public UserDTO(User user_)
         {
             Name = user_.Name;
             Email = user_.Email;
             Password = user_.Password;
-            PicPath = user_.PicPath;
         }
     }
 }
