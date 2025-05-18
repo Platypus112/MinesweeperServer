@@ -8,14 +8,14 @@ namespace MinesweeperServer.DTO
         public DateTime? Date { get; set; }
         public double TimeInSeconds { get; set; }
         public DifficultyDTO Difficulty { get; set; }
-        public UserDTO User { get; set; }
+        public AppUserDTO User { get; set; }
         public string Time { get { return TimeSpan.FromSeconds(TimeInSeconds).ToString(); } private set { this.Time = value; } }
         public bool IsDeleted { get; set; }
 
 
         public GameDataDTO() { }
 
-        public GameDataDTO(int id_, DateTime date_, double timeInSeconds_, DifficultyDTO difficulty_, UserDTO user_, bool isDeleted_)
+        public GameDataDTO(int id_, DateTime date_, double timeInSeconds_, DifficultyDTO difficulty_, AppUserDTO user_, bool isDeleted_)
         {
             Id = id_;
             Date = date_;

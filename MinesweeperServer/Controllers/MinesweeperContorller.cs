@@ -777,7 +777,9 @@ namespace MinesweeperServer.Controllers
                             List<FinishedGame> r = await context.GetAllFriendGamesByEmail(email);
                             foreach (FinishedGame g in r)
                             {
-                                result.Add(new GameDataDTO(g));
+                                GameDataDTO gameDTO = new(g);
+                                gameDTO.User.PicPath = GetProfileImageVirtualPath(g.User.Id);
+                                result.Add(gameDTO);
                             }
                         }
                         else
@@ -790,7 +792,9 @@ namespace MinesweeperServer.Controllers
                         List<FinishedGame> r = await context.GetAllGamesWithData();
                         foreach (FinishedGame g in r)
                         {
-                            result.Add(new GameDataDTO(g));
+                            GameDataDTO gameDTO = new(g);
+                            gameDTO.User.PicPath = GetProfileImageVirtualPath(g.User.Id);
+                            result.Add(gameDTO);
                         }
                     }
                 }
@@ -874,7 +878,7 @@ namespace MinesweeperServer.Controllers
                     return Conflict("User doesn't exist");
                 }
                 string email= HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to record game");
                 }
