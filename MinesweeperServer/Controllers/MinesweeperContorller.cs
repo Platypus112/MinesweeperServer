@@ -62,7 +62,7 @@ namespace MinesweeperServer.Controllers
             try
             {
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to accept report");
                 }
@@ -91,7 +91,7 @@ namespace MinesweeperServer.Controllers
             try
             {
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to absolve report");
                 }
@@ -120,7 +120,7 @@ namespace MinesweeperServer.Controllers
             try
             {
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to remove report");
                 }
@@ -149,7 +149,7 @@ namespace MinesweeperServer.Controllers
             try
             {
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to remove game");
                 }
@@ -187,7 +187,7 @@ namespace MinesweeperServer.Controllers
                     return Conflict("User doesn't exist");
                 }
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to report game");
                 }
@@ -263,17 +263,17 @@ namespace MinesweeperServer.Controllers
                     return Conflict("logged user can't edit a different user's details");
                 }
 
-                if (await context.GetUserByName(user.Name) != null)
+                if (logged.Name!=user.Name&&await context.GetUserByName(user.Name) != null)
                 {
                     return Conflict("this username has already been used");
                 }
                 logged.Name = user.Name;
                 logged.Password = user.Password;
                 logged.Description= user.Description;
-                logged.PicPath= user.PicPath;
+                if(user.PicPath!= "/profileImages/default.png") logged.PicPath= user.PicPath;
                 context.SaveChanges();
 
-                return Ok();
+                return Ok(user);
             }
             catch (Exception ex)
             {
@@ -342,7 +342,7 @@ namespace MinesweeperServer.Controllers
         }
 
         [HttpPost("RemoveFriend")]
-        public async Task<IActionResult> RemoveFriend([FromBody]UserDTO user)
+        public async Task<IActionResult> RemoveFriend([FromBody]LoginInfoDTO user)
         {
             try
             {
@@ -374,7 +374,7 @@ namespace MinesweeperServer.Controllers
         }
 
         [HttpPost("BlockUser")]
-        public async Task<IActionResult> BlockUser([FromBody]UserDTO user)
+        public async Task<IActionResult> BlockUser([FromBody]LoginInfoDTO user)
         {
             try
             {
@@ -940,7 +940,7 @@ namespace MinesweeperServer.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] UserDTO userDTO)
+        public async Task<IActionResult> Register([FromBody] LoginInfoDTO userDTO)
         {
             try
             {
@@ -980,7 +980,7 @@ namespace MinesweeperServer.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody]UserDTO userDTO)
+        public async Task<IActionResult> Login([FromBody]LoginInfoDTO userDTO)
         {
             try
             {

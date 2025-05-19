@@ -8,11 +8,11 @@ namespace MinesweeperServer.DTO
         public DateTime? Date { get; set; }
         public double TimeInSeconds { get; set; }
         public DifficultyDTO Difficulty { get; set; }
-        public UserDTO User { get; set; }
+        public LoginInfoDTO User { get; set; }
 
         public FinishedGameDTO() { }
 
-        public FinishedGameDTO(int id_,DateTime date_,double timeInSeconds_, DifficultyDTO difficulty_,UserDTO user_)
+        public FinishedGameDTO(int id_,DateTime date_,double timeInSeconds_, DifficultyDTO difficulty_,LoginInfoDTO user_)
         {
             Id = id_;
             Date=date_;

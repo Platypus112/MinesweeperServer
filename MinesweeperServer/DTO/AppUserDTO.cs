@@ -13,6 +13,8 @@ namespace MinesweeperServer.DTO
 
         public string? PicPath { get; set; }
 
+        public string? FullPicPath { get; set; }
+
         public bool IsAdmin { get; set; }
 
         public string? Description { get; set; }
@@ -26,6 +28,7 @@ namespace MinesweeperServer.DTO
             PicPath = picPath_;
             IsAdmin = isAdmin_;
             Description = description_;
+            FullPicPath= picPath_;
         }
 
         public AppUserDTO(Models.User user)
@@ -36,6 +39,8 @@ namespace MinesweeperServer.DTO
             Password = user.Password;
             IsAdmin = user.Admin;
             Description = user.Description;
+            PicPath= user.PicPath;
+            FullPicPath= user.PicPath;
         }
 
     }

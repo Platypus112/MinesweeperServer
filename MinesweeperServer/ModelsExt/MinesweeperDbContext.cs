@@ -10,7 +10,7 @@ namespace MinesweeperServer.Models
     {
         public async Task<UserReport> GetUserReportById(int id)
         {
-            return this.UserReports.Include(r => r.User).Include(r => r.Status).FirstOrDefault(r => r.User.Id == id);
+            return this.UserReports.Include(r => r.User).Include(r => r.Status).FirstOrDefault(r => r.Id == id);
         }
         public async Task<User> GetUserById(int id)
         {
@@ -69,7 +69,7 @@ namespace MinesweeperServer.Models
         {
             return this.Difficulties.FirstOrDefault(x => x.Name == dto.Name);
         }
-        public async Task<User> GetUserByDTO(UserDTO dto)
+        public async Task<User> GetUserByDTO(LoginInfoDTO dto)
         {
             return this.Users.Include(u => u.UserReports).ThenInclude(r => r.Status).FirstOrDefault(x => x.Name == dto.Name);
         }

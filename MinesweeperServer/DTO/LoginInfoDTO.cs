@@ -3,7 +3,7 @@ using MinesweeperServer.Models;
 
 namespace MinesweeperServer.DTO
 {
-    public class UserDTO
+    public class LoginInfoDTO
     {
         public string Name { get; set; }
 
@@ -12,15 +12,15 @@ namespace MinesweeperServer.DTO
         public string Password { get; set; }
 
 
-        public UserDTO() { }
+        public LoginInfoDTO() { }
 
-        public UserDTO(string name_, string email_, string password_,string picPath_)
+        public LoginInfoDTO(string name_, string email_, string password_,string picPath_)
         {
             Name = name_;
             Email = email_;
             Password = password_;
         }
-        public UserDTO(User user_)
+        public LoginInfoDTO(User user_)
         {
             Name = user_.Name;
             Email = user_.Email;

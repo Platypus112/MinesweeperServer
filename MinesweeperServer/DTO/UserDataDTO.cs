@@ -14,6 +14,8 @@ namespace MinesweeperServer.DTO
 
         public string? PicPath { get; set; }
 
+        public string? FullPicPath { get; set; }
+
         public bool IsAdmin { get; set; }
 
         public string? Description { get; set; }
@@ -31,6 +33,7 @@ namespace MinesweeperServer.DTO
             Email = email_;
             Password = password_;
             PicPath = picPath_;
+            FullPicPath = picPath_;
             IsAdmin = isAdmin_;
             Description = description_;
             IsReported = isReported_;
@@ -44,6 +47,8 @@ namespace MinesweeperServer.DTO
             Name = user.Name;
             Email = user.Email;
             Password = user.Password;
+            PicPath = user.PicPath;
+            FullPicPath = user.PicPath;
             IsAdmin = user.Admin;
             Description = user.Description;
             IsReported = user.UserReports.Any(r => r.StatusId == 2);
