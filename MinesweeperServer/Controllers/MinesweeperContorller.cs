@@ -162,11 +162,21 @@ namespace MinesweeperServer.Controllers
                 {
                     return NotFound("no user found with corrosponding id");
                 }
-                foreach (UserReport report in context.UserReports)
+                foreach (UserReport report in context.UserReports.Where(r=>r.UserId == user.Id))
                 {
-                    if (report.UserId == user.Id) context.UserReports.Remove(report);
+                    context.UserReports.Remove(report);
                 }
-                context.Users.Remove(user);
+                foreach(FriendRequest request in context.FriendRequests.Where(f => f.UserRecievingId == user.Id || f.UserSendingId == user.Id))
+                {
+                    context.FriendRequests.Remove(request);
+                }
+                List<FinishedGame> finishedGames = context.FinishedGames.Where(g => g.UserId == user.Id).ToList();
+                foreach (FinishedGame game in finishedGames)
+                {
+                    context.GameReports.Where(r=>r.GameId==game.Id).ExecuteDelete();
+                    context.FinishedGames.Remove(game);
+                }
+                context.Remove(user);
                 context.SaveChanges();
                 return Ok("succussful");
             }
@@ -227,15 +237,11 @@ namespace MinesweeperServer.Controllers
                 List<GameDataDTO> games = new();
                 for(int i = 1;i <= 5; i++)
                 {
-                    FinishedGame toAdd=null;
-                    for (int j = 0; j < finishedGames.Count; j++)
-                    {
-                        toAdd = finishedGames.Where(g => g.Difficulty.Id == i).OrderByDescending(g => g.TimeInSeconds).ToList()[j];
-                        if(!toAdd.GameReports.Any(r => r.StatusId == 2))j=finishedGames.Count;
-                    }
+                    FinishedGame toAdd = finishedGames.Where(g => g.Difficulty.Id == i).MaxBy(g=>g.TimeInSeconds);
                     if(toAdd != null)
                     {
                         GameDataDTO toAddDTO = new(toAdd);
+                        games.Add(toAddDTO);
                     }
                 }
                 return Ok(games);
@@ -1017,7 +1023,7 @@ namespace MinesweeperServer.Controllers
         public async Task<IActionResult> UploadProfileImageAsync(IFormFile file)
         {
             //Check if who is logged in
-            string? userEmail = HttpContext.Session.GetString("loggedInUser");
+            string? userEmail = HttpContext.Session.GetString("loggedUserEmail");
             if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User is not logged in");
