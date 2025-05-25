@@ -237,7 +237,7 @@ namespace MinesweeperServer.Controllers
                 List<GameDataDTO> games = new();
                 for(int i = 1;i <= 5; i++)
                 {
-                    FinishedGame toAdd = finishedGames.Where(g => g.Difficulty.Id == i).MaxBy(g=>g.TimeInSeconds);
+                    FinishedGame toAdd = finishedGames.Where(g => g.Difficulty.Id == i&&g.GameReports.Count(r=>r.StatusId==2)==0).MaxBy(g=>g.TimeInSeconds);
                     if(toAdd != null)
                     {
                         GameDataDTO toAddDTO = new(toAdd);
