@@ -323,29 +323,6 @@ namespace MinesweeperServer.Controllers
             }
         }
 
-        [HttpGet("GetAllFriendRequests")]
-        public async Task<IActionResult> GetAllFriendRequests()
-        {
-            try
-            {
-                string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (string.IsNullOrEmpty(email))
-                {
-                    return Unauthorized("User must be logged to get all his friends");
-                }
-                List<FriendRequest> friendRequests = await context.GetAllFriendsRequestsByEmail(email);
-                List<FriendRequestDTO> result = new();
-                foreach(FriendRequest request in friendRequests)
-                {
-                    result.Add(new(request,email));
-                }
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
 
         [HttpPost("RemoveFriend")]
         public async Task<IActionResult> RemoveFriend([FromBody]LoginInfoDTO user)
@@ -457,7 +434,7 @@ namespace MinesweeperServer.Controllers
                 context.FriendRequests.Remove(request);
                 context.SaveChanges();
 
-                return Ok(new AppUserDTO(recieving));
+                return Ok(new AppUserDTO(sending));
             }
             catch (Exception ex)
             {
@@ -763,12 +740,25 @@ namespace MinesweeperServer.Controllers
                     }
                     return Ok(result);
                 }
+                else if (!(type.Contains("users") || type.Contains("games")) && type.Contains("difficulties"))
+                {
+                    List<Difficulty> difficulties = await context.GetDifficultyList();
+                    foreach (Difficulty d in difficulties)
+                    {
+                        result.Add(new DifficultyDTO(d));
+                    }
+                }
                 else if (!(type.Contains("users") || type.Contains("games"))) return Conflict("Collection must contain a type of either users or gamers but not both");
 
                 if (type.Contains("games"))
                 {
                     if (type.Contains("reports") && type.Contains("admin"))
                     {
+                        string email = HttpContext.Session.GetString("loggedUserEmail");
+                        if (!(await context.GetUserByEmail(email)).Admin)
+                        {
+                            return Unauthorized("cannot access this information without being an admin");
+                        }
                         List<GameReport> r = await context.GetAllGameReports();
                         foreach (GameReport R in r)
                         {
@@ -808,6 +798,11 @@ namespace MinesweeperServer.Controllers
                 {
                     if (type.Contains("reports") && type.Contains("admin"))
                     {
+                        string email = HttpContext.Session.GetString("loggedUserEmail");
+                        if (!(await context.GetUserByEmail(email)).Admin)
+                        {
+                            return Unauthorized("cannot access this information without being an admin");
+                        }
                         List<UserReport> r = await context.GetAllUserReports();
                         foreach (UserReport R in r)
                         {
@@ -919,31 +914,6 @@ namespace MinesweeperServer.Controllers
             }
         }
 
-        [HttpGet("GetDifficulties")]
-        public async Task<IActionResult> GetDifficulties()
-        {
-            try
-            {
-                List<Difficulty> difficulties = await context.GetDifficultyList();
-
-                if (difficulties==null||difficulties.Count <= 0)
-                {
-                    return NotFound("no difficulties found");
-                }
-
-                List<DifficultyDTO> resultList = new List<DifficultyDTO>();
-                foreach (Difficulty d in difficulties)
-                {
-                    resultList.Add(new DifficultyDTO(d));
-                }
-                return Ok(resultList);
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
 
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] LoginInfoDTO userDTO)
