@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="MinesweeperServer.DTO.AppUserDTO" Collapsed="true">
+    <Position X="4" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAACAgAAAAAAAAAAQACAAAAAACAEABAAAAAAA=</HashCode>
+      <FileName>DTO\AppUserDTO.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MinesweeperServer.DTO.DifficultyDTO" Collapsed="true">
+    <Position X="9" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAEQAAEAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DTO\DifficultyDTO.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MinesweeperServer.DTO.FinishedGameDTO">
+    <Position X="16.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAADAAAAAAAAAQAAAAAAAAAAAAAAAACBAAAAAAAAAAA=</HashCode>
+      <FileName>DTO\FinishedGameDTO.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="User" />
+      <Property Name="Difficulty" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="MinesweeperServer.DTO.FriendRequestDTO" Collapsed="true">
+    <Position X="14.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAEEAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DTO\FriendRequestDTO.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Status" />
+      <Property Name="UserRecieving" />
+      <Property Name="UserSending" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="MinesweeperServer.DTO.GameDataDTO">
+    <Position X="19.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAADAAAAAAAAAQAAAAAAAAAAAAAAAACBAAAAAQAAAQA=</HashCode>
+      <FileName>DTO\GameDataDTO.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Difficulty" />
+      <Property Name="User" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="MinesweeperServer.DTO.GameReportDTO" Collapsed="true">
+    <Position X="6.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAEAAAgAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DTO\GameReportDTO.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Game" />
+      <Property Name="Status" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="MinesweeperServer.DTO.LoginInfoDTO" Collapsed="true">
+    <Position X="10.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAQAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>DTO\LoginInfoDTO.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MinesweeperServer.DTO.StatusDTO" Collapsed="true">
+    <Position X="9.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DTO\StatusDTO.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MinesweeperServer.DTO.UserDataDTO" Collapsed="true">
+    <Position X="12.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAACCgAAAAAAAAAAQACAAAAAACAEABAAAAAAA=</HashCode>
+      <FileName>DTO\UserDataDTO.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MinesweeperServer.DTO.UserReportDTO" Collapsed="true">
+    <Position X="6.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAADAAAEAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DTO\UserReportDTO.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="User" />
+      <Property Name="Status" />
+    </ShowAsAssociation>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

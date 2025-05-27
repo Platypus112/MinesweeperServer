@@ -75,9 +75,9 @@ CREATE TABLE FriendRequests(
 	CONSTRAINT FK_RequestToStatus FOREIGN KEY (statusId) REFERENCES Statuses(id),
 )
 go
-INSERT INTO dbo.Users VALUES('joeAdmin','idancar7@gmail.com','idan12345',null,'most esteamed leader',1);
-INSERT INTO dbo.Users VALUES('joeUser','joe6987@gmail.com','joemode5',null,'nuh uh',0);
-INSERT INTO dbo.Users VALUES('badGuy','baddy77@gmail.com','bad1',null,'tee hee',0);
+INSERT INTO dbo.Users VALUES('joeAdmin','idancar7@gmail.com','Idan12345',null,'most esteamed leader',1);
+INSERT INTO dbo.Users VALUES('joeUser','joe6987@gmail.com','joeMode5',null,'nuh uh',0);
+INSERT INTO dbo.Users VALUES('badGuy','baddy77@gmail.com','Bad12',null,'tee hee',0);
 
 INSERT INTO dbo.Statuses VALUES('pending');
 INSERT INTO dbo.Statuses VALUES('approved');
