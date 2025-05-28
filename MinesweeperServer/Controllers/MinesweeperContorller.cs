@@ -541,6 +541,16 @@ namespace MinesweeperServer.Controllers
                     else if (check.Statusid == 3) return Unauthorized("User had blocked recieving user");
                     else return Conflict("request already sent");
                 }
+                check=await context.GetFriendRequestByNameDTO(new FriendRequestDTO()
+                {
+                    UserRecieving=request.UserSending,
+                    UserSending=request.UserRecieving,
+                    Status=request.Status,
+                });
+                if(check != null)
+                {
+                    if (check.Statusid == 1) return Conflict("User has already sent you friend request");
+                }
 
                 FriendRequest addRequest = new()
                 {
