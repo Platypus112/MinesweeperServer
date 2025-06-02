@@ -784,7 +784,7 @@ namespace MinesweeperServer.Controllers
                             foreach (FinishedGame g in r)
                             {
                                 GameDataDTO gameDTO = new(g);
-                                //if user is reported their pic won't be shown and instead whill show default value
+                                //if user is reported their pic won't be shown and instead will show default value
                                 if (!g.User.UserReports.Any(r => r.StatusId == 2)) gameDTO.User.PicPath = GetProfileImageVirtualPath(g.User.Id);
                                 else gameDTO.User.PicPath = $"/profileImages/default.png";
                                 result.Add(gameDTO);
@@ -801,7 +801,7 @@ namespace MinesweeperServer.Controllers
                         foreach (FinishedGame g in r)
                         {
                             GameDataDTO gameDTO = new(g);
-                            //if user is reported their pic won't be shown and instead whill show default value
+                            //if user is reported their pic won't be shown and instead will show default value
                             if (!g.User.UserReports.Any(r => r.StatusId == 2)) gameDTO.User.PicPath = GetProfileImageVirtualPath(g.User.Id);
                             else gameDTO.User.PicPath = $"/profileImages/default.png";
                             result.Add(gameDTO);
