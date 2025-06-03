@@ -258,7 +258,7 @@ namespace MinesweeperServer.Controllers
         {
             try
             {
-                string email = HttpContext.Session.GetString("loggedUserEmail");
+                string? email = HttpContext.Session.GetString("loggedUserEmail");
                 if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to edit user");
@@ -276,7 +276,6 @@ namespace MinesweeperServer.Controllers
                 logged.Name = user.Name;
                 logged.Password = user.Password;
                 logged.Description= user.Description;
-                if(user.PicPath!= "/profileImages/default.png") logged.PicPath= user.PicPath;
                 context.SaveChanges();
 
                 return Ok(user);
@@ -574,7 +573,7 @@ namespace MinesweeperServer.Controllers
             try
             {
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to accept report");
                 }
@@ -603,7 +602,7 @@ namespace MinesweeperServer.Controllers
             try
             {
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))   
                 {
                     return Unauthorized("User must be logged to absolve report");
                 }
@@ -632,7 +631,7 @@ namespace MinesweeperServer.Controllers
             try
             {
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to remove report");
                 }
@@ -661,7 +660,7 @@ namespace MinesweeperServer.Controllers
             try
             {
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to remove game");
                 }
@@ -699,7 +698,7 @@ namespace MinesweeperServer.Controllers
                     return Conflict("Game doesn't exist");
                 }
                 string email = HttpContext.Session.GetString("loggedUserEmail");
-                if (!string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(email))
                 {
                     return Unauthorized("User must be logged to report game");
                 }
@@ -787,6 +786,14 @@ namespace MinesweeperServer.Controllers
                                 //if user is reported their pic won't be shown and instead will show default value
                                 if (!g.User.UserReports.Any(r => r.StatusId == 2)) gameDTO.User.PicPath = GetProfileImageVirtualPath(g.User.Id);
                                 else gameDTO.User.PicPath = $"/profileImages/default.png";
+                                result.Add(gameDTO);
+                            }
+                            //adding all logged user games
+                            List<FinishedGame> finishedGames = await context.GetAllGamesByEmail(email);
+                            foreach (FinishedGame g in finishedGames)
+                            {
+                                GameDataDTO gameDTO = new(g);
+                                gameDTO.User.PicPath = GetProfileImageVirtualPath(g.User.Id);
                                 result.Add(gameDTO);
                             }
                         }
@@ -1062,7 +1069,7 @@ namespace MinesweeperServer.Controllers
                 }
 
             }
-            AppUserDTO dtoUser = new AppUserDTO(user);
+            AppUserDTO dtoUser = new(user);
             dtoUser.PicPath = GetProfileImageVirtualPath(user.Id);
             return Ok(dtoUser);
         }

@@ -21,10 +21,7 @@ namespace MinesweeperServer
 
             builder.Services.AddSession(options =>
             {
-                // Set a short timeout for easy testing.
                 options.IdleTimeout = TimeSpan.FromHours(2.5);
-                options.Cookie.HttpOnly = false;
-                options.Cookie.IsEssential = true;
             });
 
             builder.Services.AddDbContext<MinesweeperDbContext>(options =>

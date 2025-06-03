@@ -142,9 +142,9 @@ go
 -- extreme difficulty game to report by badGuy
 INSERT INTO dbo.FinishedGames VALUES(3,5,'4-june-2025',20) --badguy
 -- report for ^^ game
-INSERT INTO dbo.UserReports VALUES(1,2,'too fast')
-INSERT INTO dbo.UserReports VALUES(1,3,'hate this guy')
-INSERT INTO dbo.UserReports VALUES(1,1,'broke my record sdadge')
+INSERT INTO dbo.GameReports VALUES(1,2,'too fast')
+INSERT INTO dbo.GameReports VALUES(1,3,'hate this guy')
+INSERT INTO dbo.GameReports VALUES(1,1,'broke my record sdadge')
 
 
 -- begginer difficulty games

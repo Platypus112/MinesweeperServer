@@ -18,11 +18,11 @@ namespace MinesweeperServer.Models
         }
         public async Task<List<FinishedGame>> GetAllGamesByEmail(string email)
         {
-            return this.FinishedGames.Include(g=>g.GameReports).ThenInclude(r=>r.Status).Include(g => g.User).Include(g => g.Difficulty).Where(g => g.User.Email == email).ToList();
+            return this.FinishedGames.Include(g => g.User).Include(g => g.Difficulty).Include(g => g.GameReports).ThenInclude(r => r.Status).Where(g => g.User.Email == email).ToList();
         }
         public async Task<List<FinishedGame>> GetAllGamesByUsername(string username)
         {
-            return this.FinishedGames.Include(g => g.GameReports).ThenInclude(r => r.Status).Include(g=>g.User).Include(g=>g.Difficulty).Where(g => g.User.Name == username).ToList();
+            return this.FinishedGames.Include(g => g.User).Include(g => g.Difficulty).Include(g => g.GameReports).ThenInclude(r => r.Status).Where(g => g.User.Name == username).ToList();
         }
         public async Task<bool> CheckIfUserIsBlockedByName(string user, string blocked)
         {
