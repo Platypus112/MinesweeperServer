@@ -68,12 +68,12 @@ namespace MinesweeperServer.Controllers
                 }
                 else if (!(await context.GetUserByEmail(email)).Admin)
                 {
-                    return Unauthorized("cannot accept report without being an admin");
+                    return Unauthorized("Cannot accept report without being an admin");
                 }
                 UserReport report = await context.GetUserReportById(r.Id);
                 if (report == null)
                 {
-                    return NotFound("no report found with corrosponding id");
+                    return NotFound("No report found with corrosponding id");
                 }
                 report.StatusId = 2;
                 context.SaveChanges();
@@ -97,12 +97,12 @@ namespace MinesweeperServer.Controllers
                 }
                 else if (!(await context.GetUserByEmail(email)).Admin)
                 {
-                    return Unauthorized("cannot absolve report without being an admin");
+                    return Unauthorized("Cannot absolve report without being an admin");
                 }
                 UserReport report = await context.GetUserReportById(r.Id);
                 if (report == null)
                 {
-                    return NotFound("no report found with corrosponding id");
+                    return NotFound("No report found with corrosponding id");
                 }
                 report.StatusId = 3;
                 context.SaveChanges();
@@ -126,12 +126,12 @@ namespace MinesweeperServer.Controllers
                 }
                 else if (!(await context.GetUserByEmail(email)).Admin)
                 {
-                    return Unauthorized("cannot remove report without being an admin");
+                    return Unauthorized("Cannot remove report without being an admin");
                 }
                 UserReport report = await context.GetUserReportById(r.Id);
                 if (report == null)
                 {
-                    return NotFound("no report found with corrosponding id");
+                    return NotFound("No report found with corrosponding id");
                 }
                 context.UserReports.Remove(report);
                 context.SaveChanges();
@@ -155,12 +155,12 @@ namespace MinesweeperServer.Controllers
                 }
                 else if (!(await context.GetUserByEmail(email)).Admin)
                 {
-                    return Unauthorized("cannot remove game without being an admin");
+                    return Unauthorized("Cannot remove game without being an admin");
                 }
                 User user = await context.GetUserById(u.Id.Value);
                 if (user == null)
                 {
-                    return NotFound("no user found with corrosponding id");
+                    return NotFound("No user found with corrosponding id");
                 }
                 foreach (UserReport report in context.UserReports.Where(r=>r.UserId == user.Id))
                 {
@@ -266,12 +266,12 @@ namespace MinesweeperServer.Controllers
                 User logged = await context.GetUserByEmail(email);
                 if (logged.Email!=user.Email)
                 {
-                    return Conflict("logged user can't edit a different user's details");
+                    return Conflict("Logged user can't edit a different user's details");
                 }
 
                 if (logged.Name!=user.Name&&await context.GetUserByName(user.Name) != null)
                 {
-                    return Conflict("this username has already been used");
+                    return Conflict("This username has already been used");
                 }
                 logged.Name = user.Name;
                 logged.Password = user.Password;
@@ -299,7 +299,7 @@ namespace MinesweeperServer.Controllers
                 User logged=await context.GetUserByEmail(email);
                 if(!(await context.CheckIfUserIsBlockedByName(logged.Name,user.Name)))
                 {
-                    return Conflict("logged user isn't blocking given user");
+                    return Conflict("Logged user isn't blocking given user");
                 }
                 FriendRequest blockRequest = await context.GetFriendRequestByNameDTO(new FriendRequestDTO()
                 {
@@ -428,7 +428,7 @@ namespace MinesweeperServer.Controllers
                 }
                 else if ((await context.GetUserByEmail(email)).Id != recieving.Id)
                 {
-                    return Unauthorized("cannot decline friend request from a different user than the one logged in");
+                    return Unauthorized("Cannot decline friend request for a different user than the one logged in");
                 }
                 context.FriendRequests.Remove(request);
                 context.SaveChanges();
@@ -477,7 +477,7 @@ namespace MinesweeperServer.Controllers
                 User logged = await context.GetUserByEmail(email);
                 if (logged.Id != recieving.Id)
                 {
-                    return Unauthorized("cannot accpet friend request from a different user than the one logged in");
+                    return Unauthorized("cannot accept friend request for a different user than the one logged in");
                 }
                 request.Statusid = 2;
                 FriendRequest other = new()
@@ -523,22 +523,22 @@ namespace MinesweeperServer.Controllers
                 }
                 else if ((await context.GetUserByEmail(email)).Id!=sending.Id)
                 {
-                    return Unauthorized("cannot send friend request from a different user than the one logged in");
+                    return Unauthorized("Cannot send friend request from a different user than the one logged in");
                 }
                 if((await context.CheckIfUserIsBlockedByName(recieving.Name, sending.Name)))
                 {
-                    return Unauthorized("User had been blocked by recieving user");
+                    return Unauthorized("User had been blocked by recieving user");//users who have approved reports won't be able to add new friends or be shown on the leaderboard
                 }
                 if (sending.UserReports.Where(r => r.Status.Name == "Approved").Count() > 0)
                 {
-                    return Unauthorized("can't make friends while being a criminal");
+                    return Unauthorized("Can't make friends while being a criminal");
                 }
                 FriendRequest check = await context.GetFriendRequestByNameDTO(request);
                 if (check != null)
                 {
                     if (check.Statusid == 2) return Conflict("Users are already friends");
                     else if (check.Statusid == 3) return Unauthorized("User had blocked recieving user");
-                    else return Conflict("request already sent");
+                    else return Conflict("Request already sent");
                 }
                 check=await context.GetFriendRequestByNameDTO(new FriendRequestDTO()
                 {
@@ -579,12 +579,12 @@ namespace MinesweeperServer.Controllers
                 }
                 else if (!(await context.GetUserByEmail(email)).Admin)
                 {
-                    return Unauthorized("cannot accept report without being an admin");
+                    return Unauthorized("Cannot accept report without being an admin");
                 }
                 GameReport report = await context.GetGameReportById(r.Id);
                 if (report == null)
                 {
-                    return NotFound("no report found with corrosponding id");
+                    return NotFound("No report found with corrosponding id");
                 }
                 report.StatusId = 2;
                 context.SaveChanges();
@@ -608,12 +608,12 @@ namespace MinesweeperServer.Controllers
                 }
                 else if (!(await context.GetUserByEmail(email)).Admin)
                 {
-                    return Unauthorized("cannot absolve report without being an admin");
+                    return Unauthorized("Cannot absolve report without being an admin");
                 }
                 GameReport report = await context.GetGameReportById(r.Id);
                 if (report == null)
                 {
-                    return NotFound("no report found with corrosponding id");
+                    return NotFound("No report found with corrosponding id");
                 }
                 report.StatusId = 3;
                 context.SaveChanges();
@@ -637,12 +637,12 @@ namespace MinesweeperServer.Controllers
                 }
                 else if (!(await context.GetUserByEmail(email)).Admin)
                 {
-                    return Unauthorized("cannot remove report without being an admin");
+                    return Unauthorized("Cannot remove report without being an admin");
                 }
                 GameReport report = await context.GetGameReportById(r.Id);
                 if (report == null)
                 {
-                    return NotFound("no report found with corrosponding id");
+                    return NotFound("No report found with corrosponding id");
                 }
                 context.GameReports.Remove(report);
                 context.SaveChanges();
@@ -666,12 +666,12 @@ namespace MinesweeperServer.Controllers
                 }
                 else if (!(await context.GetUserByEmail(email)).Admin)
                 {
-                    return Unauthorized("cannot remove game without being an admin");
+                    return Unauthorized("Cannot remove game without being an admin");
                 }
                 FinishedGame game = await context.GetGameById(g.Id);
                 if(game == null)
                 {
-                    return NotFound("no game found with corrosponding id");
+                    return NotFound("No game found with corrosponding id");
                 }
                 foreach(GameReport report in context.GameReports)
                 {
@@ -799,7 +799,7 @@ namespace MinesweeperServer.Controllers
                         }
                         else
                         {
-                            return Conflict("Can't access friend games list without a user logged in");
+                            return Unauthorized("Can't access friend games list without a user logged in");
                         }
                     }
                     else
@@ -822,7 +822,7 @@ namespace MinesweeperServer.Controllers
                         string email = HttpContext.Session.GetString("loggedUserEmail");
                         if (!(await context.GetUserByEmail(email)).Admin)
                         {
-                            return Unauthorized("cannot access this information without being an admin");
+                            return Unauthorized("Cannot access this information without being an admin");
                         }
                         List<UserReport> r = await context.GetAllUserReports();
                         foreach (UserReport R in r)
@@ -846,7 +846,7 @@ namespace MinesweeperServer.Controllers
                         }
                         else
                         {
-                            return Conflict("Can't access friend list without a user logged in");
+                            return Unauthorized("Can't access friend list without a user logged in");
                         }
                     }
                     else if (type.Contains("blocked"))
@@ -865,7 +865,7 @@ namespace MinesweeperServer.Controllers
                         }
                         else
                         {
-                            return Conflict("Can't access block list without a user logged in");
+                            return Unauthorized("Can't access block list without a user logged in");
                         }
                     }
                     else
@@ -906,7 +906,7 @@ namespace MinesweeperServer.Controllers
                 }
                 else if (email != user.Email)
                 {
-                    return Unauthorized("cannot record game for other players");
+                    return Unauthorized("Cannot record game for other players");
                 }
                 Difficulty difficulty = await context.GetDifficultyByDTO(gameDTO.Difficulty);
                 if (difficulty == null)
@@ -943,11 +943,11 @@ namespace MinesweeperServer.Controllers
             {
                 if (await context.GetUserByEmail(userDTO.Email) != null)
                 {
-                    return Conflict("this email has already been used");
+                    return Conflict("This email has already been used");
                 }
                 if(await context.GetUserByName(userDTO.Name) != null)
                 {
-                    return Conflict("this username has already been used");
+                    return Conflict("This username has already been used");
                 }
 
                 HttpContext.Session.Clear();
@@ -991,7 +991,7 @@ namespace MinesweeperServer.Controllers
                 else return NoContent();
                 if(string.IsNullOrEmpty(userDTO.Password)) return NoContent();
 
-                if (user ==null)return NotFound("no user with this email or username");
+                if (user ==null)return NotFound("No user with this email or username");
 
                 if(user.Password!=userDTO.Password) return Unauthorized("password is wrong");
 
