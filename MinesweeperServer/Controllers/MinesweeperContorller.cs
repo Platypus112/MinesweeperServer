@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Castle.Components.DictionaryAdapter;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MinesweeperServer.DTO;
@@ -1051,6 +1052,22 @@ namespace MinesweeperServer.Controllers
 
                 //Build path in the web root (better to a specific folder under the web root
                 string filePath = $"{this.webHostEnvironment.WebRootPath}\\profileImages\\{user.Id}{extention}";
+
+                //Check existingt image
+                string currentImage = GetProfileImageVirtualPath(user.Id);
+                if (!currentImage.Contains("default") && !currentImage.Contains(extention))
+                {
+                    string currentExt = currentImage.Substring(currentImage.LastIndexOf(".")).ToLower();
+                    string currentPath = $"{this.webHostEnvironment.WebRootPath}\\profileImages\\{user.Id}{currentExt}";
+                    try
+                    {
+                        System.IO.File.Delete(currentPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        return BadRequest(ex.Message);
+                    }
+                }
 
                 using (var stream = System.IO.File.Create(filePath))
                 {
